@@ -1,0 +1,4 @@
+# Output and Project directories
+.gradle/
+.idea/
+build/
