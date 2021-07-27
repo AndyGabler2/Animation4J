@@ -34,6 +34,7 @@ run {
 }
 
 test {
+    // Only true JUnit tests run in build. Meaning main classes can go in test directory.
     useJUnitPlatform()
 }
 
