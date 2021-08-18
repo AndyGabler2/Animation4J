@@ -6,6 +6,7 @@ import com.andronikus.animation4j.stopmotion.scenario.QwertyState;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class RigScenarioRunner extends JPanel implements ActionListener {
+
+    private boolean doTilts = false;
 
     private final QwertyAnimationRig rig;
     private final QwertyState qwertyState = new QwertyState();
@@ -39,16 +42,49 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
 
     @Override
     public void paintComponent(Graphics graphics) {
+        drawBackGroundSquares(graphics);
+
         final GraphicsContext context = new GraphicsContext();
         context.setGraphics2d((Graphics2D)graphics);
         context.setObserver(this);
         context.setComponentHeight(this.getHeight());
 
         // Note, this is not proper.
-        rig.renderFromCenter(context, new Object(), qwertyState, 400, 750, 0);
-        rig.renderFromCenter(context, new Object(), qwertyState, 800, 750, Math.PI / 4);
-        rig.renderFromCenter(context, new Object(), qwertyState, 400, 305, Math.PI / 2);
-        rig.renderFromCenter(context, new Object(), qwertyState, 800, 305, Math.PI);
+        rig.renderFromCenter(context, new Object(), qwertyState, 400, 500, 0);
+        rig.renderFromCenter(context, new Object(), qwertyState, 800, 500, !doTilts ? 0 : Math.PI / 4);
+        rig.renderFromCenter(context, new Object(), qwertyState, 400, 200, !doTilts ? 0 : Math.PI / 2);
+        rig.renderFromCenter(context, new Object(), qwertyState, 800, 200, !doTilts ? 0 : Math.PI);
+    }
+
+    private void drawBackGroundSquares(Graphics graphics) {
+        int tileSize = 18;
+
+        int width = this.getWidth();
+        int height = this.getHeight();
+
+        int xCounter = 0;
+        boolean isMagentaRow;
+        while (xCounter * tileSize < width) {
+            isMagentaRow = true;
+            if (xCounter % 2 == 0) {
+                isMagentaRow = false;
+            }
+            int yCounter = 0;
+            while (yCounter * tileSize < height) {
+                if (isMagentaRow) {
+                    isMagentaRow = false;
+                    graphics.setColor(Color.BLACK);
+                } else {
+                    graphics.setColor(Color.MAGENTA);
+                    isMagentaRow = true;
+                }
+
+                graphics.fillRect(xCounter * tileSize, yCounter * tileSize, tileSize, tileSize);
+                yCounter++;
+            }
+
+            xCounter++;
+        }
     }
 
     @Override
@@ -76,6 +112,8 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
                 qwertyState.setQwertyHappy(false);
             } else if (e.getKeyCode() == KeyEvent.VK_S) {
                 qwertyState.setQwertySad(false);
+            } else if (e.getKeyCode() == KeyEvent.VK_T) {
+                doTilts = !doTilts;
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.andronikus.animation4j.rig;
 
-import java.awt.Graphics2D;
 import java.util.Objects;
 
 public class AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
