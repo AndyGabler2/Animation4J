@@ -16,6 +16,8 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     private final List<JointRegistration> jointRegistrations = new ArrayList<>();
     private int fulcrumXOffset = -1;
     private int fulcrumYOffset = -1;
+    private double fulcrumAngle = 0;
+    private double fulcrumDistance = 0;
     private int width = -1;
     private int height = -1;
     private boolean reflectX;
@@ -132,6 +134,13 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         if (fulcrumYOffset == -1) {
             fulcrumYOffset = height / 2;
         }
+
+        fulcrumDistance = Math.sqrt(Math.pow(fulcrumXOffset, 2) + Math.pow(fulcrumYOffset, 2));
+        double fulcrumAcosAngle = Math.acos(((double) fulcrumXOffset) / fulcrumDistance);
+        if (fulcrumYOffset < 0) {
+            fulcrumAcosAngle = -fulcrumAcosAngle;
+        }
+        fulcrumAngle = fulcrumAcosAngle;
 
         finalized = true;
         return this;

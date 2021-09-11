@@ -6,6 +6,7 @@ import com.andronikus.animation4j.stopmotion.scenario.QwertyState;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -50,10 +51,17 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         context.setComponentHeight(this.getHeight());
 
         // Note, this is not proper.
+        graphics.setColor(Color.CYAN);
+        ((Graphics2D) graphics).setStroke(new BasicStroke());
+
         rig.renderFromCenter(context, new Object(), qwertyState, 400, 500, 0);
+        graphics.drawRect(400 - 16, this.getHeight() - (500 + 32), 32, 64);
         rig.renderFromCenter(context, new Object(), qwertyState, 800, 500, !doTilts ? 0 : Math.PI / 4);
+        graphics.drawRect(800 - 16, this.getHeight() - (500 + 32), 32, 64);
         rig.renderFromCenter(context, new Object(), qwertyState, 400, 200, !doTilts ? 0 : Math.PI / 2);
+        graphics.drawRect(400 - 16, this.getHeight() - (200 + 32), 32, 64);
         rig.renderFromCenter(context, new Object(), qwertyState, 800, 200, !doTilts ? 0 : Math.PI);
+        graphics.drawRect(800 - 16, this.getHeight() - (200 + 32), 32, 64);
     }
 
     private void drawBackGroundSquares(Graphics graphics) {
