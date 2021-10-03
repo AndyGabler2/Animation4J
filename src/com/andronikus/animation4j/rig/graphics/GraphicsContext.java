@@ -32,4 +32,8 @@ public class GraphicsContext {
     public void setComponentHeight(int componentHeight) {
         this.componentHeight = componentHeight;
     }
+
+    public Graphics2D createGraphicalInstance() {
+        return (Graphics2D) graphics2d.create();
+    }
 }

@@ -5,153 +5,103 @@ import com.andronikus.animation4j.rig.imageprovider.StaticLimbImageProvider;
 import com.andronikus.animation4j.rig.imageprovider.StopMotionLimbImageProvider;
 import com.andronikus.animation4j.stopmotion.StopMotionController;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
+/**
+ * Stateful graphical representation of a limb in an animation.
+ *
+ * @param <CONTEXT_OBJECT_TYPE> Type of the object that provides greater context
+ * @param <ANIMATION_OF_TYPE> The type of object being animated
+ * @author Andronikus
+ */
 public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
-    private final List<JointRegistration> jointRegistrations = new ArrayList<>();
     private int fulcrumXOffset = -1;
     private int fulcrumYOffset = -1;
-    private double fulcrumAngle = 0;
-    private double fulcrumDistance = 0;
-    private int width = -1;
-    private int height = -1;
-    private boolean reflectX;
-    private boolean reflectY;
-    private ILimbImageProvider<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> imageProvider = null;
-
+    final LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> renderInstance = new LimbRenderInstance<>();
     private boolean finalized = false;
 
+    /**
+     * Render the limb.
+     *
+     * @param graphics Graphical context object.
+     * @param contextObject Overarching context provider object
+     * @param animatedEntity The thing being animated
+     * @param centerX The center X
+     * @param centerY The center y
+     * @param angle Angle the limb and its children will be tilted at
+     * @param pretilt Tilt from limbs this is jointed from
+     */
     public void render(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,
         ANIMATION_OF_TYPE animatedEntity,
-        int leftX,
-        int bottomY,
-        double angle
+        int centerX,
+        int centerY,
+        double angle,
+        double pretilt
     ) {
         if (!finalized) {
             throw new IllegalStateException("Animation limb must be finalized before rendering.");
         }
 
-        if (!imageProvider.canAnimateEntity(animatedEntity)) {
+        if (!renderInstance.imageProvider.canAnimateEntity(animatedEntity)) {
             throw new IllegalArgumentException("Image provider cannot animate given entity.");
         }
 
-        imageProvider.provideContext(contextObject, animatedEntity);
-
-        final int maxY = bottomY + height;
-        final int transformedY = graphics.getComponentHeight() - maxY;
-
-        final int pivotX = leftX + fulcrumXOffset;
-        final int pivotY = bottomY + fulcrumYOffset;
-
-        jointRegistrations.forEach(jointRegistration -> {
-            if (jointRegistration.renderBeneath) {
-                renderJoint(graphics, contextObject, animatedEntity, jointRegistration, angle, pivotX, pivotY);
-            }
-        });
-
-        doDrawing(graphics, leftX, transformedY, angle);
-
-        jointRegistrations.forEach(jointRegistration -> {
-            if (!jointRegistration.renderBeneath) {
-                renderJoint(graphics, contextObject, animatedEntity, jointRegistration, angle, pivotX, pivotY);
-            }
-        });
+        renderInstance.doRender(graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
     }
 
-    private void doDrawing(GraphicsContext graphics, int leftX, int transformedY,double angle) {
-        Graphics2D renderInstance = (Graphics2D) graphics.getGraphics2d().create();
-        renderInstance.translate(leftX, transformedY);
-        renderInstance.rotate(transformAngleBeforeTrig(angle), fulcrumXOffset, height - fulcrumYOffset);
-        int drawingX = 0;
-        int drawingY = 0;
-        int drawingWidth = width;
-        int drawingHeight = height;
-
-        if (reflectX) {
-            drawingX = width;
-            drawingWidth = -width;
-        }
-
-        if (reflectY) {
-            drawingY = height;
-            drawingHeight = -height;
-        }
-        renderInstance.drawImage(imageProvider.getImage(), drawingX, drawingY, drawingWidth, drawingHeight, graphics.getObserver());
-        renderInstance.dispose();
-    }
-
-    private void renderJoint(
-        GraphicsContext context,
-        CONTEXT_OBJECT_TYPE contextObject,
-        ANIMATION_OF_TYPE animatedEntity,
-        JointRegistration jointRegistration,
-        double angle,
-        int pivotX,
-        int pivotY
-    ) {
-        final double jointAngleFromFulcrum = jointRegistration.angleFromFulcrum + angle;
-        int jointX = (int)(Math.cos(jointAngleFromFulcrum) * ((double)jointRegistration.distanceFromFulcrum)) + pivotX;
-        int jointY = (int)(Math.sin(jointAngleFromFulcrum) * ((double)jointRegistration.distanceFromFulcrum)) + pivotY;
-
-        jointX -= jointRegistration.joint.getLimb().width / 2;
-        jointY -= jointRegistration.joint.getLimb().height / 2;
-
-        final double nextAngle = angle + jointRegistration.joint.getRotation();
-        final AnimationLimb limb = jointRegistration.joint.getLimb();
-
-        limb.render(context, contextObject, animatedEntity, jointX, jointY, nextAngle);
-    }
-
-    private double transformAngleBeforeTrig(double angle) {
-        return -(angle % (Math.PI * 2));
-    }
-
+    /**
+     * Finish rigging the limb.
+     *
+     * @return The limb
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> finishRigging() {
 
         if (finalized) {
             throw new IllegalStateException("Animation limb cannot be finalized twice.");
         }
 
-        if (width <= 0) {
+        if (renderInstance.width <= 0) {
             throw new IllegalStateException("Width must be set before animation limb is finalized.");
-        } else if (height <= 0) {
+        } else if (renderInstance.height <= 0) {
             throw new IllegalStateException("Height must be set before animation limb is finalized.");
-        } else if (imageProvider == null) {
+        } else if (renderInstance.imageProvider == null) {
             throw new IllegalStateException("Image provider must be set before animation limb is finalized.");
         }
 
+        // Default fulcrum to the center
         if (fulcrumXOffset == -1) {
-            fulcrumXOffset = width / 2;
+            fulcrumXOffset = renderInstance.width / 2;
         }
-
         if (fulcrumYOffset == -1) {
-            fulcrumYOffset = height / 2;
+            fulcrumYOffset = renderInstance.height / 2;
         }
 
-        fulcrumDistance = Math.sqrt(Math.pow(fulcrumXOffset, 2) + Math.pow(fulcrumYOffset, 2));
-        double fulcrumAcosAngle = Math.acos(((double) fulcrumXOffset) / fulcrumDistance);
+        renderInstance.fulcrumDistance = Math.sqrt(Math.pow(fulcrumXOffset, 2) + Math.pow(fulcrumYOffset, 2));
+        double fulcrumAcosAngle = Math.acos(((double) fulcrumXOffset) / renderInstance.fulcrumDistance);
         if (fulcrumYOffset < 0) {
             fulcrumAcosAngle = -fulcrumAcosAngle;
         }
-        fulcrumAngle = fulcrumAcosAngle;
+        renderInstance.fulcrumAngle = fulcrumAcosAngle;
 
         finalized = true;
         return this;
     }
 
+    /**
+     * Recursively crawl through the joints on the limb to build a map of joint IDs to their Joint.
+     *
+     * @param jointMap The map to add to
+     */
     void collectJoints(HashMap<Short, AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE>> jointMap) {
         if (!finalized) {
             throw new IllegalStateException("Animation limb must be finalized before joint map is built.");
         }
 
-        jointRegistrations.forEach(registration -> {
+        renderInstance.jointRegistrations.forEach(registration -> {
             boolean added = (jointMap.put(registration.id, registration.joint) == null);
             if (!added) {
                 throw new IllegalArgumentException("More than one joint with ID of " + registration.id + " exists.");
@@ -161,76 +111,162 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         });
     }
 
+    /**
+     * Check if limb is finalized or can be built further.
+     *
+     * @return Finalized
+     */
     public boolean isFinalized() {
         return finalized;
     }
 
+    /**
+     * Set the X offset, from the center of the object, to the fulcrum.
+     * @param fulcrumXOffset The X offset of the fulcrum
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setFulcrumXOffset(int fulcrumXOffset) {
         this.fulcrumXOffset = fulcrumXOffset;
         return this;
     }
 
+    /**
+     * Set the Y offset, from the center of the object, to the fulcrum.
+     * @param fulcrumYOffset The Y offset of the fulcrum
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setFulcrumYOffset(int fulcrumYOffset) {
         this.fulcrumYOffset = fulcrumYOffset;
         return this;
     }
 
+    /**
+     * Set the pre-rotate width.
+     *
+     * @param width The width
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setWidth(int width) {
         // TODO No I won't regret this! No I won't ever get punished by this constraint
         if (finalized) {
             throw new IllegalStateException("Width cannot be set after animation limb is finalized.");
         }
-        this.width = width;
+        this.renderInstance.width = width;
         return this;
     }
 
+    /**
+     * Get the pre-rotate width.
+     *
+     * @return The width
+     */
     int getWidth() {
-        return width;
+        return renderInstance.width;
     }
 
+    /**
+     * Set the pre-rotate height.
+     *
+     * @param height The height
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setHeight(int height) {
         // TODO No I won't regret this! No I won't ever get punished by this constraint
         if (finalized) {
             throw new IllegalStateException("Height cannot be set after animation limb is finalized.");
         }
-        this.height = height;
+        this.renderInstance.height = height;
         return this;
     }
 
-    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setReflectX(boolean reflectX) {
-        this.reflectX = reflectX;
-        return this;
-    }
-
-    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setReflectY(boolean reflectY) {
-        this.reflectY = reflectY;
-        return this;
-    }
-
+    /**
+     * Get the pre-rotate height.
+     *
+     * @return The height
+     */
     int getHeight() {
-        return height;
+        return renderInstance.height;
     }
 
+    /**
+     * Set whether this is reflected along the X-axis (reflect before rotate).
+     *
+     * @param reflectX Reflect before rotate flag
+     * @return Self
+     */
+    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setReflectX(boolean reflectX) {
+        this.renderInstance.reflectX = reflectX;
+        return this;
+    }
+
+    /**
+     * Set whether this is reflected along the Y-axis (reflect before rotate).
+     *
+     * @param reflectY Reflect before rotate flag
+     * @return Self
+     */
+    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setReflectY(boolean reflectY) {
+        this.renderInstance.reflectY = reflectY;
+        return this;
+    }
+
+    /**
+     * Set a static image as the image provider.
+     *
+     * @param image The image
+     * @return self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setImage(Image image) {
         return setImageProvider(new StaticLimbImageProvider<>(image));
     }
 
+    /**
+     * Set and use a stop motion controller as the image provider.
+     *
+     * @param controller The stop motion controller
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setStopMotionController(StopMotionController<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE, ?> controller) {
         return setImageProvider(new StopMotionLimbImageProvider<>(controller));
     }
 
+    /**
+     * Set the image provider called for rendering.
+     *
+     * @param provider The image provider
+     * @return Self
+     */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setImageProvider(ILimbImageProvider<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> provider) {
         if (finalized) {
             throw new IllegalStateException("Image provider cannot be set after animation limb is finalized.");
         }
-        this.imageProvider = provider;
+        this.renderInstance.imageProvider = provider;
         return this;
     }
 
+    /**
+     * Register a joint to another limb.
+     *
+     * @param id The ID of the joint.
+     * @param angleFromFulcrum The angle the joint is from the fulcrum of this.
+     * @param distanceFromFulcrum The distance from the fulcrum of the joint is.
+     * @param renderBeneath Is this joint rendered beneath this limb?
+     * @return The joint
+     */
     public AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> registerJoint(short id, double angleFromFulcrum, int distanceFromFulcrum, boolean renderBeneath) {
         return registerJoint(id, angleFromFulcrum, distanceFromFulcrum, renderBeneath, new AnimationLimb<>());
     }
 
+    /**
+     * Register a joint to another limb.
+     *
+     * @param id The ID of the joint.
+     * @param angleFromFulcrum The angle the joint is from the fulcrum of this.
+     * @param distanceFromFulcrum The distance from the fulcrum of the joint is.
+     * @param renderBeneath Is this joint rendered beneath this limb?
+     * @param toLimb The limb the joint is to
+     * @return The joint
+     */
     public AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> registerJoint(short id, double angleFromFulcrum, int distanceFromFulcrum, boolean renderBeneath, AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> toLimb) {
         final JointRegistration registration = new JointRegistration();
         final AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> joint = new AnimationJoint<>(toLimb);
@@ -240,7 +276,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         registration.id = id;
         registration.joint = joint;
         registration.renderBeneath = renderBeneath;
-        jointRegistrations.add(registration);
+        renderInstance.jointRegistrations.add(registration);
 
         return joint;
     }
@@ -248,26 +284,26 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     /**
      * Class containing information about joints to this limb.
      */
-    private class JointRegistration {
+    class JointRegistration {
         /**
          * The joint.
          */
-        private AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> joint;
+        AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> joint;
         /**
          * Identifier for the Joint. Must be unique per rig
          */
-        private short id;
+        short id;
         /**
          * Angle the joint is at from the fulcrum of the this limb, relative to 0PI.
          */
-        private double angleFromFulcrum;
+        double angleFromFulcrum;
         /**
          * Distance from the fulcrum of this object.
          */
-        private int distanceFromFulcrum;
+        int distanceFromFulcrum;
         /**
          * Will the limb attached to this joint be rendered beneath this joint.
          */
-        private boolean renderBeneath;
+        boolean renderBeneath;
     }
 }

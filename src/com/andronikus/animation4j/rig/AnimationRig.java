@@ -25,18 +25,7 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         int centerY,
         double rotation
     ) {
-        rootLimbs.forEach(limb -> limb.render(graphics, contextObject, animatedEntity, centerX - (limb.getWidth() / 2), centerY - (limb.getHeight() / 2), rotation));
-    }
-
-    public void renderFromMinCorner(
-        GraphicsContext graphics,
-        CONTEXT_OBJECT_TYPE contextObject,
-        ANIMATION_OF_TYPE animatedEntity,
-        int cornerX,
-        int cornerY,
-        double rotation
-    ) {
-        rootLimbs.forEach(limb -> limb.render(graphics, contextObject, animatedEntity, cornerX, cornerY, rotation));
+        rootLimbs.forEach(limb -> limb.render(graphics, contextObject, animatedEntity, centerX, centerY, rotation, 0));
     }
 
     /**
@@ -56,7 +45,7 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * is only called when intended.
      *
      * @param object The object that may or may not be the object this controller is animating
-     * @return Whether or not this controller animates given object
+     * @return Whether this controller animates given object
      */
     public abstract boolean checkIfObjectIsAnimatedEntity(ANIMATION_OF_TYPE object);
 }
