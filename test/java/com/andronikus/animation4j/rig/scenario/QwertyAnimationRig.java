@@ -38,80 +38,64 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
             .setStopMotionController(new QwertyHeadStopMotionController())
             .finishRigging();
 
-        final AnimationLimb<Object, QwertyState> leftArmTop = torso.registerJoint((short)3, Math.PI * 13 / 16, 26, false)
+        final AnimationLimb<Object, QwertyState> leftArmTop = torso.registerJoint((short)3, Math.PI * 19 / 32, 32, false)
             .getLimb()
-            .setWidth(16)
-            .setHeight(32)
+            .setWidth(32)
+            .setHeight(64)
             .setStopMotionController(new QwertyArmStopMotionController())
-            .setFulcrumXOffset(16)
-            .setFulcrumYOffset(32)
             .finishRigging();
 
-        leftArmTop.registerJoint((short)4, -Math.PI / 16 * 9, 45, false)
+        leftArmTop.registerJoint((short)4, -Math.PI / 32 * 19, 35, false)
             .getLimb()
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(52)
             .setImage(ImagesUtil.getImage("armbottom.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(27)
             .finishRigging();
 
-        final AnimationLimb<Object, QwertyState> rightArmTop = torso.registerJoint((short)5, Math.PI * 3 / 16, 26, false)
+        final AnimationLimb<Object, QwertyState> rightArmTop = torso.registerJoint((short)5, Math.PI * 13 / 32, 32, false)
             .getLimb()
-            .setWidth(16)
-            .setHeight(32)
+            .setWidth(32)
+            .setHeight(64)
             .setStopMotionController(new QwertyArmStopMotionController())
-            .setFulcrumXOffset(16)
-            .setFulcrumYOffset(32)
             .setReflectX(true)
             .finishRigging();
 
-        rightArmTop.registerJoint((short)6, -Math.PI / 16 * 9, 45, false)
+        rightArmTop.registerJoint((short)6, -Math.PI / 32 * 13, 35, false)
             .getLimb()
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(52)
             .setImage(ImagesUtil.getImage("armbottom.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(27)
             .finishRigging();
 
-        final AnimationLimb<Object, QwertyState> leftLegTop = torso.registerJoint((short)7, Math.PI * 23 / 16, 42, true)
+        final AnimationLimb<Object, QwertyState> leftLegTop = torso.registerJoint((short)7, Math.PI * 23 / 16, 32, true)
             .getLimb()
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(64)
             .setImage(ImagesUtil.getImage("legtop.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(32)
             .setReflectX(true)
             .finishRigging();
 
-        leftLegTop.registerJoint((short)8, Math.PI / -2, 42, false)
+        leftLegTop.registerJoint((short)8, Math.PI / -2, 32, false)
             .getLimb()
             .setReflectX(true)
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(52)
             .setImage(ImagesUtil.getImage("legbottom.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(27)
             .finishRigging();
 
-        final AnimationLimb<Object, QwertyState> rightLegTop = torso.registerJoint((short)9, Math.PI * 25 / 16, 42, true)
+        final AnimationLimb<Object, QwertyState> rightLegTop = torso.registerJoint((short)9, Math.PI * 25 / 16, 32, true)
             .getLimb()
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(64)
             .setImage(ImagesUtil.getImage("legtop.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(32)
             .setReflectX(true)
             .finishRigging();
 
-        rightLegTop.registerJoint((short)10, Math.PI / -2, 42, false)
+        rightLegTop.registerJoint((short)10, Math.PI / -2, 32, false)
             .getLimb()
             .setWidth(16)
-            .setHeight(32)
+            .setHeight(52)
             .setImage(ImagesUtil.getImage("legbottom.png"))
-            .setFulcrumXOffset(8)
-            .setFulcrumYOffset(27)
             .finishRigging();
 
         return Collections.singletonList(torso);

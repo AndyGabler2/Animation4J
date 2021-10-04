@@ -121,26 +121,6 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     }
 
     /**
-     * Set the X offset, from the center of the object, to the fulcrum.
-     * @param fulcrumXOffset The X offset of the fulcrum
-     * @return Self
-     */
-    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setFulcrumXOffset(int fulcrumXOffset) {
-        this.fulcrumXOffset = fulcrumXOffset;
-        return this;
-    }
-
-    /**
-     * Set the Y offset, from the center of the object, to the fulcrum.
-     * @param fulcrumYOffset The Y offset of the fulcrum
-     * @return Self
-     */
-    public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setFulcrumYOffset(int fulcrumYOffset) {
-        this.fulcrumYOffset = fulcrumYOffset;
-        return this;
-    }
-
-    /**
      * Set the pre-rotate width.
      *
      * @param width The width

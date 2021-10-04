@@ -23,9 +23,6 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     boolean reflectY;
     ILimbImageProvider<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> imageProvider = null;
 
-    private double cachedFulcrumXDelta;
-    private double cachedFulcrumYDelta;
-
     public void doRender(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,
@@ -39,16 +36,10 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             throw new IllegalArgumentException("Animated entity cannot be rendered by image provider.");
         }
 
-        calculateFulcrumOffset(pretilt);
         // TODO consider precalculating: Predicate list
         renderJoints(joint -> joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
         renderPipeline(graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
         renderJoints(joint -> !joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
-    }
-
-    private void calculateFulcrumOffset(double pretilt) {
-        cachedFulcrumXDelta = fulcrumDistance * Math.cos(fulcrumAngle + pretilt);
-        cachedFulcrumYDelta = fulcrumDistance * Math.sin(fulcrumAngle + pretilt);
     }
 
     private void renderJoints(
@@ -68,18 +59,14 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             final double nextPretilt = pretilt + angle;
             final double angleToNextCenter = nextPretilt + joint.angleFromFulcrum;
 
-            //TODO this is the part im sketchy on
+            //TODO Credense to custom fulcrum
             // If we can get us to the minimum corner, we can calculate where fulcrum is.
             // So why don't we, get the coordinate of the corner.
             // Then we calculate the fulcrum location.
             // Fulcrum is, in theory, fixed and rotation-agnostic
             // Using fulcrum location, use angleToNextCenter to calculate where the center of next limb is
-            final int minX = centerX - (width / 2);
-            final int minY = centerY - (height / 2);
-            final int fulcrumX = (int) cachedFulcrumXDelta + minX;
-            final int fulcrumY = (int) cachedFulcrumYDelta + minY;
-            final int nextX = fulcrumX + (int)(joint.distanceFromFulcrum * Math.cos(angleToNextCenter));
-            final int nextY = fulcrumY + (int)(joint.distanceFromFulcrum * Math.sin(angleToNextCenter));
+            final int nextX = centerX + (int)(joint.distanceFromFulcrum * Math.cos(angleToNextCenter));
+            final int nextY = centerY + (int)(joint.distanceFromFulcrum * Math.sin(angleToNextCenter));
 
             joint.joint.getLimb().render(
                 graphics,
@@ -125,8 +112,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
          */
         graphicalInstance.rotate(
             angle + pretilt,
-            cachedFulcrumXDelta,
-            cachedFulcrumYDelta
+            width / 2,//TODO fulcrum
+            height / 2 //TODO fulcrum
         );
 
         // Reflective step

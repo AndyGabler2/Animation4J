@@ -18,6 +18,7 @@ import java.awt.event.KeyListener;
 public class RigScenarioRunner extends JPanel implements ActionListener {
 
     private boolean doTilts = false;
+    private boolean torsoBox = false;
 
     private final QwertyAnimationRig rig;
     private final QwertyState qwertyState = new QwertyState();
@@ -50,18 +51,26 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         context.setObserver(this);
         context.setComponentHeight(this.getHeight());
 
-        // Note, this is not proper.
         graphics.setColor(Color.CYAN);
         ((Graphics2D) graphics).setStroke(new BasicStroke());
 
+        // Note, this is not proper. Normally don't want to call the rig like this for stop motion reasons
         rig.renderFromCenter(context, new Object(), qwertyState, 400, 500, 0);
-        graphics.drawRect(400 - 16, this.getHeight() - (500 + 32), 32, 64);
+        if (torsoBox) {
+            graphics.drawRect(400 - 16, this.getHeight() - (500 + 32), 32, 64);
+        }
         rig.renderFromCenter(context, new Object(), qwertyState, 800, 500, !doTilts ? 0 : Math.PI / 4);
-        graphics.drawRect(800 - 16, this.getHeight() - (500 + 32), 32, 64);
+        if (torsoBox) {
+            graphics.drawRect(800 - 16, this.getHeight() - (500 + 32), 32, 64);
+        }
         rig.renderFromCenter(context, new Object(), qwertyState, 400, 200, !doTilts ? 0 : Math.PI / 2);
-        graphics.drawRect(400 - 16, this.getHeight() - (200 + 32), 32, 64);
+        if (torsoBox) {
+            graphics.drawRect(400 - 16, this.getHeight() - (200 + 32), 32, 64);
+        }
         rig.renderFromCenter(context, new Object(), qwertyState, 800, 200, !doTilts ? 0 : Math.PI);
-        graphics.drawRect(800 - 16, this.getHeight() - (200 + 32), 32, 64);
+        if (torsoBox) {
+            graphics.drawRect(800 - 16, this.getHeight() - (200 + 32), 32, 64);
+        }
     }
 
     private void drawBackGroundSquares(Graphics graphics) {
@@ -122,6 +131,8 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
                 qwertyState.setQwertySad(false);
             } else if (e.getKeyCode() == KeyEvent.VK_T) {
                 doTilts = !doTilts;
+            } else if (e.getKeyCode() == KeyEvent.VK_B) {
+                torsoBox = !torsoBox;
             }
         }
     }
