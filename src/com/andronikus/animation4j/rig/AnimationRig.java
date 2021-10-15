@@ -4,6 +4,7 @@ import com.andronikus.animation4j.rig.graphics.GraphicsContext;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
@@ -48,4 +49,14 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @return Whether this controller animates given object
      */
     public abstract boolean checkIfObjectIsAnimatedEntity(ANIMATION_OF_TYPE object);
+
+    /**
+     * Get a {@link AnimationJoint} in the rig for its id.
+     *
+     * @param id The id
+     * @return The Joint with given ID
+     */
+    public AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> jointForId(short id) {
+        return Objects.requireNonNull(jointMap.get(id), "No Joint for ID " + id + ".");
+    }
 }

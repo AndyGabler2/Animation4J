@@ -30,11 +30,29 @@ public class Pair<TYPE_ONE, TYPE_TWO> {
     }
 
     /**
+     * Set the first item in the pair.
+     *
+     * @param aFirst The first item
+     */
+    public void setFirst(TYPE_ONE aFirst) {
+        first = aFirst;
+    }
+
+    /**
      * Get second item in the pair.
      *
-     * @return The second item.
+     * @return The second item
      */
     public TYPE_TWO getSecond() {
         return second;
+    }
+
+    /**
+     * Set the second item in the pair.
+     *
+     * @param aSecond The second item
+     */
+    public void setSecond(TYPE_TWO aSecond) {
+        second = aSecond;
     }
 }
