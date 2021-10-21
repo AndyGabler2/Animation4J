@@ -3,6 +3,7 @@ package com.andronikus.animation4j.animation;
 import com.andronikus.animation4j.rig.AnimationJoint;
 import com.andronikus.animation4j.rig.AnimationRig;
 import com.andronikus.animation4j.rig.graphics.GraphicsContext;
+import com.andronikus.animation4j.statemachine.State;
 import com.andronikus.animation4j.util.Pair;
 
 import java.util.ArrayList;
@@ -12,23 +13,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
+public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
+    Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>,
+    CONTEXT_PROVIDER,
+    ANIMATION_TYPE
+> {
 
     // Structure and link variables
     private AnimationRig<CONTEXT_PROVIDER, ANIMATION_TYPE> rig;
-    private List<Pair<BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean>, Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>>> transitions = new ArrayList<>();
     // Map of joints to their keyframe and total duration.
     private Map<AnimationJoint, Pair<Long, List<KeyFrame>>> keyFrames = new HashMap<>();
     private Map<AnimationJoint, AnimationKeyFrameState> activeFrames = new HashMap<>();
     private List<Pair<Long, Double>> rootRotationFrames = new ArrayList<>();
     private long rootRotationTotalDuration = 0L;
 
-    // State control variables
-    private boolean interruptable = true;
     private long ticksOnAnimation = 0L;
     private boolean finalized = false;
 
-    private void nextRender(
+    public void nextRender(
         GraphicsContext graphics,
         CONTEXT_PROVIDER contextObject,
         ANIMATION_TYPE animatedEntity,
@@ -45,17 +47,31 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
             final List<KeyFrame> frames = frameAndDurationPairing.getSecond();
 
             KeyFrame current = frameState.getActiveFrame();
-            KeyFrame target = frameState.getNextFrame();
 
-            // Check if current frame is expired
-            if (current.getDuration() != null && (ticksOnAnimation % totalDuration)- frameState.getTickCounter() >= current.getDuration()) {
+            /*
+             * If the following is true:
+             *  -The duration of the current is not null (ie, there is a subsequent frame)
+             *  -One of the following axioms for expiration of the current frame is satisfied:
+             *     ~The ticks on this cycle of the animation has gone past how long we should be on this frame
+             *     ~The ticks have completed an entire cycle
+             *
+             * When true, transition the current frame to the next frame.
+             */
+            if (current.getDuration() != null &&
+                ((ticksOnAnimation % totalDuration) - frameState.getTickCounter() >= current.getDuration() ||
+                 (ticksOnAnimation % totalDuration == 0 && ticksOnAnimation > 0) )) {
+
                 frameState.setTickCounter((frameState.getTickCounter() + current.getDuration()) % totalDuration);
                 frameState.setFrameIndex((frameState.getFrameIndex() + 1) % frames.size());
-                frameState.setActiveFrame(target);
+                frameState.setActiveFrame(frameState.getNextFrame());
                 frameState.setNextFrame(frames.get((frameState.getFrameIndex() + 1) % frames.size()));
                 frameState.setRenderedFirstFrame(false);
 
                 current = frameState.getActiveFrame();
+            }
+
+            KeyFrame target = null;
+            if (current.getDuration() != null) {
                 target = frameState.getNextFrame();
             }
 
@@ -70,7 +86,8 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
                 final double rotationDelta = target.getJointRotation() - current.getJointRotation();
                 final long ticksOnKeyFrame = (ticksOnAnimation % totalDuration) - frameState.getTickCounter();
                 final double percentageCovered = ((double) ticksOnKeyFrame) / ((double) current.getDuration());
-                joint.setRotation(current.getJointRotation() + rotationDelta * percentageCovered);
+                final double nextJointRotation = current.getJointRotation() + (rotationDelta * percentageCovered);
+                joint.setRotation(nextJointRotation);
             }
 
             frameState.setRenderedFirstFrame(true);
@@ -115,6 +132,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
         ticksOnAnimation++;
     }
 
+    @Override
     public void transitionTo() {
         if (!finalized) {
             throw new IllegalStateException("Cannot transition to animation that is not finalized.");
@@ -147,14 +165,6 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
         return this;
     }
 
-    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> withInterruptableFlag(boolean interruptable) {
-        if (finalized) {
-            throw new IllegalStateException("Interruptable flag cannot be set after animation finalization.");
-        }
-        this.interruptable = interruptable;
-        return this;
-    }
-
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> withRig(AnimationRig<CONTEXT_PROVIDER, ANIMATION_TYPE> rig) {
         if (finalized) {
             throw new IllegalStateException("Rig cannot be set after animation finalization.");
@@ -163,16 +173,17 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
         return this;
     }
 
-    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition) {
-        return createTransition(condition, new Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>().withRig(rig));
+    @Override
+    protected Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createBlankState() {
+        return new Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>().withRig(rig);
     }
 
+    @Override
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition, Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation) {
         if (finalized) {
             throw new IllegalStateException("Transition cannot be created after animation finalization.");
         }
-        this.transitions.add(new Pair<>(condition, nextAnimation));
-        return nextAnimation;
+        return super.createTransition(condition, nextAnimation);
     }
 
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> withRotationalKeyFrame(Long duration, double rotation) {
@@ -196,7 +207,13 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> {
         return builder;
     }
 
-    private class KeyFrameBuilder {
+    @Override
+    protected boolean atleastOneCycleFinished() {
+        return ticksOnAnimation > rootRotationTotalDuration &&
+            keyFrames.entrySet().stream().allMatch(pair -> ticksOnAnimation > pair.getValue().getFirst());
+    }
+
+    public class KeyFrameBuilder {
         private Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> parent;
         private KeyFrame frame;
         private short jointId;

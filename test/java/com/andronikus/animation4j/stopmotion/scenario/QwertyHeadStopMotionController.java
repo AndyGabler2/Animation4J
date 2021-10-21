@@ -51,7 +51,7 @@ public class QwertyHeadStopMotionController extends StopMotionController<Object,
     }
 
     @Override
-    public boolean checkIfObjectIsAnimatedEntity(QwertyState object) {
+    public boolean checkIfObjectIsRoot(QwertyState object) {
         return true;
     }
 }

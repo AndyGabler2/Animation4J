@@ -17,7 +17,7 @@ public class StopMotionLimbImageProvider<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE>
 
     @Override
     public boolean canAnimateEntity(ANIMATION_OF_TYPE animatedEntity) {
-        return stopMotionController.checkIfObjectIsAnimatedEntity(animatedEntity);
+        return stopMotionController.checkIfObjectIsRoot(animatedEntity);
     }
 
     @Override
