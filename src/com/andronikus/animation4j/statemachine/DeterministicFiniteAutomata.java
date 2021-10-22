@@ -1,5 +1,14 @@
 package com.andronikus.animation4j.statemachine;
 
+/**
+ * Deterministic finite automata used to transition between states and apply the state appropriately.
+ *
+ * @param <TRANSITION_CONTEXT> Type of object that provides context to transitions
+ * @param <TRANSITION_ROOT> Type of object that will actually be acted on and provides instance-specific transition logic
+ * @param <STATE_TYPE> The sub-type of the state in the DFA
+ * @param <STATE_RESULT> The type of result returned by applying the state
+ * @author Andronikus
+ */
 public abstract class DeterministicFiniteAutomata<
     TRANSITION_CONTEXT,
     TRANSITION_ROOT,
@@ -11,6 +20,11 @@ public abstract class DeterministicFiniteAutomata<
     private STATE_TYPE activeState;
     private STATE_TYPE realState;
 
+    /**
+     * Instantiate a deterministic finite automata.
+     *
+     * @param instantiationParameters Optional parameters on instantiation
+     */
     public DeterministicFiniteAutomata(Object... instantiationParameters) {
         handleInstantiationParameters(instantiationParameters);
         initialState = buildInitialStatesAndTransitions();
@@ -19,8 +33,21 @@ public abstract class DeterministicFiniteAutomata<
         initialState.transitionTo();
     }
 
+    /**
+     * If handling of instantiation parameters are required before state building, handle these parameters.
+     *
+     * @param parameters The parameters
+     */
     protected void handleInstantiationParameters(Object... parameters) {}
 
+    /**
+     * Perform the next action on a state. Method responsible for choosing and applying state.
+     *
+     * @param contextObject The context object
+     * @param root The object that is being applied to whichever state comes up
+     * @param parameters Parameters for the action
+     * @return The result of the state's action
+     */
     protected STATE_RESULT nextAction(TRANSITION_CONTEXT contextObject, TRANSITION_ROOT root, Object... parameters) {
         final STATE_TYPE nextAnimation = realState.checkTransition(contextObject, root);
 
@@ -36,6 +63,15 @@ public abstract class DeterministicFiniteAutomata<
         return doWithNextState(activeState, contextObject, root, parameters);
     }
 
+    /**
+     * Handle the next state in the state machine.
+     *
+     * @param state The state
+     * @param contextObject The object providing context to the state
+     * @param root The object being handled by the state
+     * @param parameters The parameters to pass to the state
+     * @return The result of the state's handling of the root object
+     */
     protected abstract STATE_RESULT doWithNextState(STATE_TYPE state, TRANSITION_CONTEXT contextObject, TRANSITION_ROOT root, Object... parameters);
 
     /**

@@ -23,6 +23,17 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     boolean reflectY;
     ILimbImageProvider<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> imageProvider = null;
 
+    /**
+     * Do the actual rendering.
+     *
+     * @param graphics The graphics
+     * @param contextObject The object providing context
+     * @param animatedEntity The animated object
+     * @param centerX The X coordinate of the center of the animation
+     * @param centerY The Y coordinate of the center of the animation
+     * @param angle The rotation angle
+     * @param pretilt Rotation angle built up from previous limb's joint rotations
+     */
     public void doRender(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,
@@ -42,6 +53,18 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         renderJoints(joint -> !joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
     }
 
+    /**
+     * Render the joints of the limb.
+     *
+     * @param renderCondition Predicate for whether a given limb will render
+     * @param graphics The graphics
+     * @param contextObject The object providing context
+     * @param animatedEntity The animated object
+     * @param centerX The X coordinate of the center of the animation
+     * @param centerY The Y coordinate of the center of the animation
+     * @param angle The rotation angle
+     * @param pretilt Rotation angle built up from previous limb's joint rotations
+     */
     private void renderJoints(
         Predicate<AnimationLimb.JointRegistration> renderCondition,
         GraphicsContext graphics,
@@ -80,6 +103,17 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         });
     }
 
+    /**
+     * The actual algorithm for the render of the current limb.
+     *
+     * @param graphics The graphics
+     * @param contextObject The object providing context
+     * @param animatedEntity The animated object
+     * @param centerX The X coordinate of the center of the animation
+     * @param centerY The Y coordinate of the center of the animation
+     * @param angle The rotation angle
+     * @param pretilt Rotation angle built up from previous limb's joint rotations
+     */
     private void renderPipeline(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,

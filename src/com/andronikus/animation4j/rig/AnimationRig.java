@@ -6,11 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A rig of limbs and joints that can be rendered together.
+ *
+ * @param <CONTEXT_OBJECT_TYPE> Type of object providing greater context
+ * @param <ANIMATION_OF_TYPE> Type of object being animated
+ * @author Andronikus
+ */
 public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
     private List<AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE>> rootLimbs;
     private HashMap<Short, AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE>> jointMap = new HashMap<>();
 
+    /**
+     * Instantiate an animation rig.
+     *
+     * @param animatedObject The object being animated
+     */
     public AnimationRig(ANIMATION_OF_TYPE animatedObject) {
         rootLimbs = buildLimbs(animatedObject);
         rootLimbs.forEach(limb -> {
@@ -18,6 +30,16 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         });
     }
 
+    /**
+     * Render the rig from its center point.
+     *
+     * @param graphics The graphics context
+     * @param contextObject The object that gives greater context
+     * @param animatedEntity The object being animated
+     * @param centerX The X of the center point
+     * @param centerY The Y of the center point
+     * @param rotation The rotation
+     */
     public void renderFromCenter(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,

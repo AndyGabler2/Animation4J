@@ -55,7 +55,7 @@ public class StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_T
     }
 
     /**
-     * Transition to this state.
+     * {@inheritDoc}
      */
     @Override
     public void transitionTo() {
@@ -119,11 +119,17 @@ public class StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_T
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean atleastOneCycleFinished() {
         return ticksOnState > frameResetTickCount;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> createBlankState() {
         return new StopMotionState<>(controller);

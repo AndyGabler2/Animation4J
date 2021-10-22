@@ -13,6 +13,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+/**
+ * An animation that controls joints and other states on an {@link AnimationRig}.
+ *
+ * @param <CONTEXT_PROVIDER> Type of object that provides greater context
+ * @param <ANIMATION_TYPE> Type of object that is being animated
+ * @author Andronikus
+ */
 public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
     Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>,
     CONTEXT_PROVIDER,
@@ -132,6 +139,9 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         ticksOnAnimation++;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void transitionTo() {
         if (!finalized) {
@@ -149,6 +159,11 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         ticksOnAnimation = 0L;
     }
 
+    /**
+     * Signify that this animation is done being built and is ready to be rendered.
+     *
+     * @return Self
+     */
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> finishAnimating() {
         if (finalized) {
             throw new IllegalStateException("Animation already finalized.");
@@ -165,6 +180,12 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         return this;
     }
 
+    /**
+     * Set the animation rig this animation controls.
+     *
+     * @param rig The rig this animation controls
+     * @return Self
+     */
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> withRig(AnimationRig<CONTEXT_PROVIDER, ANIMATION_TYPE> rig) {
         if (finalized) {
             throw new IllegalStateException("Rig cannot be set after animation finalization.");
@@ -173,11 +194,17 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createBlankState() {
         return new Animation<CONTEXT_PROVIDER, ANIMATION_TYPE>().withRig(rig);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition, Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation) {
         if (finalized) {
@@ -186,6 +213,13 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         return super.createTransition(condition, nextAnimation);
     }
 
+    /**
+     * Add a key frame that controls the overall rotation of the rig.
+     *
+     * @param duration Duration of the key frame. Null signifies it is the final resting point of the animation.
+     * @param rotation The rotation
+     * @return Self
+     */
     public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> withRotationalKeyFrame(Long duration, double rotation) {
         // Quickly ensure that there is not more than one Null duration frame
         if (rootRotationFrames.stream().anyMatch(durationAndRotationPair -> durationAndRotationPair.getFirst() == null)) {
@@ -200,6 +234,11 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         return this;
     }
 
+    /**
+     * Instantiate a key frame builder.
+     *
+     * @return The key frame builder
+     */
     public KeyFrameBuilder keyFrameBuilder() {
         final KeyFrameBuilder builder = new KeyFrameBuilder();
         builder.parent = this;
@@ -207,49 +246,96 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         return builder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean atleastOneCycleFinished() {
         return ticksOnAnimation > rootRotationTotalDuration &&
             keyFrames.entrySet().stream().allMatch(pair -> ticksOnAnimation > pair.getValue().getFirst());
     }
 
+    /**
+     * Internal class to make a {@link KeyFrame}.
+     */
     public class KeyFrameBuilder {
         private Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> parent;
         private KeyFrame frame;
         private short jointId;
         private AnimationJoint<CONTEXT_PROVIDER, ANIMATION_TYPE> joint;
 
+        /**
+         * Set the joint that this keyframe is for.
+         *
+         * @param jointId The ID of the joint
+         * @return Self
+         */
         public KeyFrameBuilder withJoint(short jointId) {
             this.jointId = jointId;
             joint = rig.jointForId(jointId);
             return this;
         }
 
+        /**
+         * Set the joint rotation at this keyframe.
+         *
+         * @param rotation Joint rotation
+         * @return Self
+         */
         public KeyFrameBuilder withJointRotation(double rotation) {
             this.frame.setJointRotation(rotation);
             return this;
         }
 
+        /**
+         * Set whether X is reflected while on this frame.
+         *
+         * @param reflect Is it reflected?
+         * @return Self
+         */
         public KeyFrameBuilder withReflectX(boolean reflect) {
             frame.setReflectX(reflect);
             return this;
         }
 
+        /**
+         * Set whether Y is reflected while on this frame.
+         *
+         * @param reflect Is it reflected?
+         * @return Self
+         */
         public KeyFrameBuilder withReflectY(boolean reflect) {
             frame.setReflectY(reflect);
             return this;
         }
 
+        /**
+         * Set the duration of the keyframe. Null is for the final resting key frame of the animation.
+         *
+         * @param duration The duration
+         * @return Self
+         */
         public KeyFrameBuilder withDuration(Long duration) {
             frame.setDuration(duration);
             return this;
         }
 
+        /**
+         * Set whether this keyframe is snapped to of if it is transitioned to gradually. Currently useless.
+         *
+         * @param snapTo Snap-to value
+         * @return Self
+         */
         public KeyFrameBuilder withSnapTo(boolean snapTo) {
             frame.setSnapTo(snapTo);
             return this;
         }
 
+        /**
+         * Build the key frame and add it to the animation.
+         *
+         * @return The animation
+         */
         public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> buildKeyFrame() {
             if (finalized) {
                 throw new IllegalStateException("Key frame cannot be added after animation finalization.");

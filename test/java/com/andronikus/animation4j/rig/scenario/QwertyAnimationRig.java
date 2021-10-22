@@ -10,12 +10,20 @@ import com.andronikus.animation4j.util.ImagesUtil;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Animation rig for QWERTY.
+ *
+ * @author Andronikus
+ */
 public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
 
     public QwertyAnimationRig(QwertyState state) {
         super(state);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<AnimationLimb<Object, QwertyState>> buildLimbs(QwertyState state) {
         final QwertyLimb torso = (QwertyLimb) new QwertyLimb()
@@ -101,6 +109,9 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
         return Collections.singletonList(torso);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean checkIfObjectIsAnimatedEntity(QwertyState object) {
         return true;

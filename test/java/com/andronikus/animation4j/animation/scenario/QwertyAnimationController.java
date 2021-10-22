@@ -5,16 +5,23 @@ import com.andronikus.animation4j.animation.AnimationController;
 import com.andronikus.animation4j.rig.scenario.QwertyAnimationRig;
 import com.andronikus.animation4j.stopmotion.scenario.QwertyState;
 
+/**
+ * Animation controller for QWERTY.
+ *
+ * @author Andronikus
+ */
 public class QwertyAnimationController extends AnimationController<Object, QwertyState> {
 
     public QwertyAnimationController(QwertyState state) {
         super(new QwertyAnimationRig(state));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Animation<Object, QwertyState> buildInitialStatesAndTransitions() {
         final Animation<Object, QwertyState> idleAnimation = createAnimation()
-            .withRig(getRig())
             .withInterruptableFlag(false)
             .keyFrameBuilder()
                 .withJoint((short)3)
@@ -28,7 +35,6 @@ public class QwertyAnimationController extends AnimationController<Object, Qwert
             .buildKeyFrame();
 
         idleAnimation.createTransitionState((o, qwertyState) -> true)
-            .withRig(getRig())
             .withInterruptableFlag(true)
             .keyFrameBuilder()
                 .withJoint((short)4)
@@ -44,6 +50,9 @@ public class QwertyAnimationController extends AnimationController<Object, Qwert
         return idleAnimation.finishAnimating();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean checkIfObjectIsRoot(QwertyState object) {
         return true;

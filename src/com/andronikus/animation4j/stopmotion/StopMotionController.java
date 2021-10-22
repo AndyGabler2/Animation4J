@@ -35,6 +35,9 @@ public abstract class StopMotionController<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, 
         this.spriteSheet = spriteSheet;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected BufferedImage doWithNextState(
         StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> state,

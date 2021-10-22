@@ -42,6 +42,9 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         frame.setVisible(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics graphics) {
         drawBackGroundSquares(graphics);
@@ -73,6 +76,11 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Draw squares in the background. Helps with debug measurements.
+     *
+     * @param graphics The graphics
+     */
     private void drawBackGroundSquares(Graphics graphics) {
         int tileSize = 18;
 
@@ -104,6 +112,9 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
