@@ -41,4 +41,4 @@ test {
 mainClassName = 'com.andronikus.animation4j.Main'
 
 applicationName = 'Animation4J'
-version = "0.1.0"
+version = "1.0.0"
