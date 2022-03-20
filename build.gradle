@@ -43,7 +43,7 @@ install {
     repositories {
         mavenInstaller {
             pom.version = '1.0.0'
-            pom.groupId = 'com.github.andronikusgametech'
+            pom.groupId = 'io.github.andronikusgametech'
             pom.artifactId = applicationName
             pom.writeTo("./pom.xml")
         }

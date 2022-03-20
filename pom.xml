@@ -5,7 +5,7 @@
   <description>Tools for making simple 2D animations in Java.</description>
   <url>https://github.com/AndronikusGameTech/Animation4J</url>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.andronikusgametech</groupId>
+  <groupId>io.github.andronikusgametech</groupId>
   <artifactId>Animation4J</artifactId>
   <version>1.0.0</version>
   <dependencies>
