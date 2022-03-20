@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'maven'
 }
 
 repositories {
@@ -36,6 +37,17 @@ run {
 test {
     // Only true JUnit tests run in build. Meaning main classes can go in test directory.
     useJUnitPlatform()
+}
+
+install {
+    repositories {
+        mavenInstaller {
+            pom.version = '1.0.0'
+            pom.groupId = 'com.github.andronikusgametech'
+            pom.artifactId = applicationName
+            pom.writeTo("./pom.xml")
+        }
+    }
 }
 
 mainClassName = 'com.andronikus.animation4j.Main'

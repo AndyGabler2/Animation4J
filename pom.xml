@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <name>Animation4J</name>
+  <description>Tools for making simple 2D animations in Java.</description>
+  <url>https://github.com/AndronikusGameTech/Animation4J</url>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.andronikusgametech</groupId>
+  <artifactId>Animation4J</artifactId>
+  <version>1.0.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.6.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Andronikus GameTech</name>
+      <email>andronikus1335@gmail.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/AndronikusGameTech/Animation4J.git</connection>
+    <developerConnection>scm:git:ssh://github.com:AndronikusGameTech/Animation4J.git</developerConnection>
+    <url>http://github.com/AndronikusGameTech/Animation4J/tree/master</url>
+  </scm>
+</project>
