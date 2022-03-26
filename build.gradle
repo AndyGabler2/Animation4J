@@ -2,7 +2,11 @@ plugins {
     id 'java'
     id 'application'
     id 'maven'
+    id 'signing'
 }
+
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     maven { url "https://repo.maven.apache.org/maven2" }
@@ -39,18 +43,71 @@ test {
     useJUnitPlatform()
 }
 
-install {
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
     repositories {
-        mavenInstaller {
-            pom.version = '1.0.0'
-            pom.groupId = 'io.github.andronikusgametech'
-            pom.artifactId = applicationName
-            pom.writeTo("./pom.xml")
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Animation4J'
+                packaging 'jar'
+                description 'Tools for making simple 2D animations in Java.'
+                url 'https://github.com/AndronikusGameTech/Animation4J'
+
+                scm {
+                    connection 'scm:git:git://github.com/AndronikusGameTech/Animation4J.git'
+                    developerConnection 'scm:git:ssh://github.com:AndronikusGameTech/Animation4J.git'
+                    url 'http://github.com/AndronikusGameTech/Animation4J/tree/master'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'andronikusgametech'
+                        name 'Andronikus GameTech'
+                        email 'andronikus1335@gmail.com'
+                    }
+                }
+            }
         }
     }
 }
 
 mainClassName = 'com.andronikus.animation4j.Main'
 
+group = "io.github.andronikusgametech"
+archivesBaseName = "Animation4J"
 applicationName = 'Animation4J'
 version = "1.0.0"
