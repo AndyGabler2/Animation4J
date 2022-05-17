@@ -19,10 +19,6 @@ public abstract class StopMotionController<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, 
         BufferedImage
     > {
 
-    private StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> initialState;
-    private StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> activeState;
-    private StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> realState;
-
     private final SPRITE_SHEET_TYPE spriteSheet;
 
     /**
