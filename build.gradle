@@ -110,4 +110,4 @@ mainClassName = 'com.andronikus.animation4j.Main'
 group = "io.github.andronikusgametech"
 archivesBaseName = "Animation4J"
 applicationName = 'Animation4J'
-version = "1.0.0"
+version = "1.1.0"

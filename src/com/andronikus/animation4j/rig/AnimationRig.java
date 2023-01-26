@@ -24,10 +24,31 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param animatedObject The object being animated
      */
     public AnimationRig(ANIMATION_OF_TYPE animatedObject) {
+        this(animatedObject, null);
+    }
+
+    /**
+     * Instantiate an animation rig.
+     *
+     * @param animatedObject The object being animated
+     * @param callbackParameter Call back parameter that can be handled before the limbs are built
+     */
+    public AnimationRig(ANIMATION_OF_TYPE animatedObject, Object callbackParameter) {
+        preLimbBuild(callbackParameter);
         rootLimbs = buildLimbs(animatedObject);
         rootLimbs.forEach(limb -> {
             limb.collectJoints(jointMap);
         });
+    }
+
+    /**
+     * Optional method that is called before creating the limbs that can be used to handle a parameter passed into the
+     * constructor.
+     *
+     * @param callbackParameter Parameter passed into the constructor
+     */
+    protected void preLimbBuild(Object callbackParameter) {
+        // Empty by default
     }
 
     /**
