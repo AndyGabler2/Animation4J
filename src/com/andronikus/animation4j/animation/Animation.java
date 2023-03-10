@@ -206,11 +206,29 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
      * {@inheritDoc}
      */
     @Override
-    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition, Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation) {
+    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(
+        BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition,
+        Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation
+    ) {
         if (finalized) {
             throw new IllegalStateException("Transition cannot be created after animation finalization.");
         }
         return super.createTransition(condition, nextAnimation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(
+        BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition,
+        boolean interruptible,
+        Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation
+    ) {
+        if (finalized) {
+            throw new IllegalStateException("Transition cannot be created after animation finalization.");
+        }
+        return super.createTransition(condition, interruptible, nextAnimation);
     }
 
     /**
