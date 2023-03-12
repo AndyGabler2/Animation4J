@@ -29,14 +29,14 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
         final QwertyLimb torso = (QwertyLimb) new QwertyLimb()
             .setWidth(32)
             .setHeight(64)
-            .setImage(ImagesUtil.getImage("torso.png"))
+            .setImage(ImagesUtil.getImage("qwerty/torso.png"))
             .finishRigging();
 
         final AnimationLimb<Object, QwertyState> neck = torso.registerJoint((short) 1, Math.PI / 2, 34, true)
             .getLimb()
             .setWidth(16)
             .setHeight(16)
-            .setImage(ImagesUtil.getImage("neck.png"))
+            .setImage(ImagesUtil.getImage("qwerty/neck.png"))
             .finishRigging();
 
         neck.registerJoint((short)2, Math.PI / 2, 18, false)
@@ -57,7 +57,7 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
             .getLimb()
             .setWidth(16)
             .setHeight(52)
-            .setImage(ImagesUtil.getImage("armbottom.png"))
+            .setImage(ImagesUtil.getImage("qwerty/armbottom.png"))
             .finishRigging();
 
         final AnimationLimb<Object, QwertyState> rightArmTop = torso.registerJoint((short)5, Math.PI * 13 / 32, 32, false)
@@ -72,14 +72,14 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
             .getLimb()
             .setWidth(16)
             .setHeight(52)
-            .setImage(ImagesUtil.getImage("armbottom.png"))
+            .setImage(ImagesUtil.getImage("qwerty/armbottom.png"))
             .finishRigging();
 
         final AnimationLimb<Object, QwertyState> leftLegTop = torso.registerJoint((short)7, Math.PI * 23 / 16, 32, true)
             .getLimb()
             .setWidth(16)
             .setHeight(64)
-            .setImage(ImagesUtil.getImage("legtop.png"))
+            .setImage(ImagesUtil.getImage("qwerty/legtop.png"))
             .setReflectX(true)
             .finishRigging();
 
@@ -88,14 +88,14 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
             .setReflectX(true)
             .setWidth(16)
             .setHeight(52)
-            .setImage(ImagesUtil.getImage("legbottom.png"))
+            .setImage(ImagesUtil.getImage("qwerty/legbottom.png"))
             .finishRigging();
 
         final AnimationLimb<Object, QwertyState> rightLegTop = torso.registerJoint((short)9, Math.PI * 25 / 16, 32, true)
             .getLimb()
             .setWidth(16)
             .setHeight(64)
-            .setImage(ImagesUtil.getImage("legtop.png"))
+            .setImage(ImagesUtil.getImage("qwerty/legtop.png"))
             .setReflectX(true)
             .finishRigging();
 
@@ -103,7 +103,7 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
             .getLimb()
             .setWidth(16)
             .setHeight(52)
-            .setImage(ImagesUtil.getImage("legbottom.png"))
+            .setImage(ImagesUtil.getImage("qwerty/legbottom.png"))
             .finishRigging();
 
         return Collections.singletonList(torso);

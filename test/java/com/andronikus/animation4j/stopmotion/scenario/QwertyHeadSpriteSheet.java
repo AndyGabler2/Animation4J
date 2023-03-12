@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 public class QwertyHeadSpriteSheet extends SpriteSheet {
 
     public QwertyHeadSpriteSheet() {
-        super("head.png", 48, 32);
+        super("qwerty/head.png", 48, 32);
     }
 
     public BufferedImage getIdleSprite(int animationState) {
