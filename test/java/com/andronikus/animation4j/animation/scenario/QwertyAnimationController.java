@@ -22,7 +22,7 @@ public class QwertyAnimationController extends AnimationController<Object, Qwert
     @Override
     protected Animation<Object, QwertyState> buildInitialStatesAndTransitions() {
         final Animation<Object, QwertyState> idleAnimation = createAnimation()
-            .withInterruptableFlag(false)
+            .withInterruptibleFlag(false)
             .keyFrameBuilder()
                 .withJoint((short)3)
                 .withDuration(30L)
@@ -35,7 +35,7 @@ public class QwertyAnimationController extends AnimationController<Object, Qwert
             .buildKeyFrame();
 
         idleAnimation.createTransitionState((o, qwertyState) -> true)
-            .withInterruptableFlag(true)
+            .withInterruptibleFlag(true)
             .keyFrameBuilder()
                 .withJoint((short)4)
                 .withDuration(20L)

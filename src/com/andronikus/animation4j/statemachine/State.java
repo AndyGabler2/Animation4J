@@ -1,7 +1,5 @@
 package com.andronikus.animation4j.statemachine;
 
-import com.andronikus.animation4j.util.Pair;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -63,7 +61,7 @@ public abstract class State<
      * @param interruptable Interruptible flag
      * @return Self
      */
-    public STATE_TYPE withInterruptableFlag(boolean interruptable) {
+    public STATE_TYPE withInterruptibleFlag(boolean interruptable) {
         this.interruptible = interruptable;
         return (STATE_TYPE) this;
     }
