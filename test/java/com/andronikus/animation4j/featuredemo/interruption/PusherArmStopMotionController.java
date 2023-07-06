@@ -11,7 +11,56 @@ public class PusherArmStopMotionController extends StopMotionController<Object, 
 
     @Override
     protected StopMotionState<Object, RetractablePusher, PusherArmSpriteSheet> buildInitialStatesAndTransitions() {
-        return null;
+        /*
+         * The Stop Motion Controllers shall have states:
+         *
+         * Neutral -> Breaking
+         *
+         * Breaking -> Broken (interruptible = false)
+         * Breaking -> Neutral (interruptible = true)
+         *
+         * Broken -> Neutral
+         */
+        final StopMotionState<Object, RetractablePusher, PusherArmSpriteSheet> neutralState = new StopMotionState<>(this)
+            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getNeutralSprite())
+            .addFrame(null, (spriteSheet, state) -> spriteSheet.getNeutralSprite());
+
+        final StopMotionState<Object, RetractablePusher, PusherArmSpriteSheet> breakingState = neutralState
+            .createTransitionState((o, retractablePusher) -> retractablePusher.isBroken());
+
+        breakingState.withInterruptibleFlag(false);
+
+        final StopMotionState<Object, RetractablePusher, PusherArmSpriteSheet> brokenState = breakingState
+            .createTransitionState((o, retractablePusher) -> true);
+        breakingState.createTransition(
+            (o, retractablePusher) -> !retractablePusher.isBroken(),
+            true,
+            neutralState
+        );
+
+        brokenState.createTransition((o, retractablePusher) -> !retractablePusher.isBroken(), neutralState);
+
+        neutralState
+            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getNeutralSprite())
+            .addFrame(null, (spriteSheet, state) -> spriteSheet.getNeutralSprite());
+
+        brokenState
+            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getBrokenSprite())
+            .addFrame(null, (spriteSheet, state) -> spriteSheet.getBrokenSprite());
+
+        breakingState
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite);
+
+        return neutralState;
     }
 
     @Override

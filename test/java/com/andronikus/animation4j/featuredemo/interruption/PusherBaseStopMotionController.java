@@ -38,6 +38,28 @@ public class PusherBaseStopMotionController extends StopMotionController<Object,
                 neutralState
         );
 
+        brokenState.createTransition((o, retractablePusher) -> !retractablePusher.isBroken(), neutralState);
+
+        neutralState
+            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getNeutralSprite())
+            .addFrame(null, (spriteSheet, state) -> spriteSheet.getNeutralSprite());
+
+        brokenState
+            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getBrokenSprite())
+            .addFrame(null, (spriteSheet, state) -> spriteSheet.getBrokenSprite());
+
+        breakingState
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite);
+
         return neutralState;
     }
 

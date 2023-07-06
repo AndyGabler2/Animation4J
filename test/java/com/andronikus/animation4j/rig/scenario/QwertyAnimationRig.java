@@ -117,5 +117,5 @@ public class QwertyAnimationRig extends AnimationRig<Object, QwertyState> {
         return true;
     }
 
-    private class QwertyLimb extends AnimationLimb<Object, QwertyState> {}
+    private static class QwertyLimb extends AnimationLimb<Object, QwertyState> {}
 }
