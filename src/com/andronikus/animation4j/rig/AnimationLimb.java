@@ -17,10 +17,10 @@ import java.util.HashMap;
  */
 public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
-    private int fulcrumXOffset = -1;
-    private int fulcrumYOffset = -1;
     final LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> renderInstance = new LimbRenderInstance<>();
     private boolean finalized = false;
+    private int widthChange = 0;
+    private int heightChange = 0;
 
     /**
      * Render the limb.
@@ -50,7 +50,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             throw new IllegalArgumentException("Image provider cannot animate given entity.");
         }
 
-        renderInstance.doRender(graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
+        renderInstance.doRender(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt);
     }
 
     /**
@@ -71,21 +71,6 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         } else if (renderInstance.imageProvider == null) {
             throw new IllegalStateException("Image provider must be set before animation limb is finalized.");
         }
-
-        // Default fulcrum to the center
-        if (fulcrumXOffset == -1) {
-            fulcrumXOffset = renderInstance.width / 2;
-        }
-        if (fulcrumYOffset == -1) {
-            fulcrumYOffset = renderInstance.height / 2;
-        }
-
-        renderInstance.fulcrumDistance = Math.sqrt(Math.pow(fulcrumXOffset, 2) + Math.pow(fulcrumYOffset, 2));
-        double fulcrumAcosAngle = Math.acos(((double) fulcrumXOffset) / renderInstance.fulcrumDistance);
-        if (fulcrumYOffset < 0) {
-            fulcrumAcosAngle = -fulcrumAcosAngle;
-        }
-        renderInstance.fulcrumAngle = fulcrumAcosAngle;
 
         finalized = true;
         return this;
@@ -127,7 +112,6 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @return Self
      */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setWidth(int width) {
-        // TODO No I won't regret this! No I won't ever get punished by this constraint
         if (finalized) {
             throw new IllegalStateException("Width cannot be set after animation limb is finalized.");
         }
@@ -140,7 +124,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      *
      * @return The width
      */
-    int getWidth() {
+    public int getWidth() {
         return renderInstance.width;
     }
 
@@ -151,7 +135,6 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @return Self
      */
     public AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setHeight(int height) {
-        // TODO No I won't regret this! No I won't ever get punished by this constraint
         if (finalized) {
             throw new IllegalStateException("Height cannot be set after animation limb is finalized.");
         }
@@ -164,7 +147,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      *
      * @return The height
      */
-    int getHeight() {
+    public int getHeight() {
         return renderInstance.height;
     }
 
@@ -259,6 +242,45 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         renderInstance.jointRegistrations.add(registration);
 
         return joint;
+    }
+
+    /**
+     * Get accessor for fields on the limb that may be adjusted by the Animation4J library after it has been finalized.
+     *
+     * @deprecated Framework use only. Anything set will be overriden.
+     * @return Accessor for fields that are modified during rendering after finalized
+     */
+    @Deprecated
+    public StateAccess stateAccessor() {
+        if (!finalized) {
+            throw new IllegalStateException("Attempted to get accessor for limb state when the limb has not been finalized.");
+        }
+        // State access should inherently have an instance of "this" with proper fields in scope
+        return new StateAccess();
+    }
+
+    /**
+     * Class with methods that can only be used when the limb has been finalized.
+     */
+    public class StateAccess {
+
+        /**
+         * Set the width change on the limb for the current render.
+         *
+         * @param aWidthChange The change in width
+         */
+        public void setWidthChange(int aWidthChange) {
+            widthChange = aWidthChange;
+        }
+
+        /**
+         * Set the height change on the limb for the current render.
+         *
+         * @param aHeightChange The change in height
+         */
+        public void setHeightChange(int aHeightChange) {
+            heightChange = aHeightChange;
+        }
     }
 
     /**

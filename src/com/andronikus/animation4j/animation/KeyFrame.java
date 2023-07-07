@@ -12,6 +12,8 @@ public class KeyFrame {
     private boolean reflectY;
     private Long duration; // Null means end frame. Cyclic frame if no null.
     private boolean snapTo;
+    private int widthChange = 0;
+    private int heightChange = 0;
 
     /**
      * Get rotation of the joint.
@@ -85,11 +87,57 @@ public class KeyFrame {
         this.duration = duration;
     }
 
+    /**
+     * Whether the position of the frame is immediately snapped to when it becomes the active frame.
+     *
+     * @return If frame should be snapped to
+     */
     public boolean isSnapTo() {
         return snapTo;
     }
 
+    /**
+     * Set whether the position of the frame is immediately snapped to when it becomes the active frame.
+     *
+     * @param snapTo If frame should be snapped to
+     */
     public void setSnapTo(boolean snapTo) {
         this.snapTo = snapTo;
+    }
+
+    /**
+     * Get the width change over the course of the keyframe.
+     *
+     * @return The width change
+     */
+    public int getWidthChange() {
+        return widthChange;
+    }
+
+    /**
+     * Set the width change over the course of the keyframe.
+     *
+     * @param widthChange The width change
+     */
+    public void setWidthChange(int widthChange) {
+        this.widthChange = widthChange;
+    }
+
+    /**
+     * Get the height change over the course of the keyframe.
+     *
+     * @return The height change
+     */
+    public int getHeightChange() {
+        return heightChange;
+    }
+
+    /**
+     * Set the height change over the course of the keyframe.
+     *
+     * @param heightChange The height change
+     */
+    public void setHeightChange(int heightChange) {
+        this.heightChange = heightChange;
     }
 }
