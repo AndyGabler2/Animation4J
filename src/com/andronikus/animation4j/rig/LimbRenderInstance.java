@@ -90,8 +90,9 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             // Then we calculate the fulcrum location.
             // Fulcrum is, in theory, fixed and rotation-agnostic
             // Using fulcrum location, use angleToNextCenter to calculate where the center of next limb is
-            final int nextX = centerX + (int)(joint.distanceFromFulcrum * Math.cos(angleToNextCenter));
-            final int nextY = centerY + (int)(joint.distanceFromFulcrum * Math.sin(angleToNextCenter));
+            final double fulcrumDistance = joint.distanceFromFulcrumMultiplier * ((double) joint.distanceFromFulcrum);
+            final int nextX = centerX + (int)(fulcrumDistance * Math.cos(angleToNextCenter));
+            final int nextY = centerY + (int)(fulcrumDistance * Math.sin(angleToNextCenter));
 
             joint.joint.getLimb().render(
                 graphics,

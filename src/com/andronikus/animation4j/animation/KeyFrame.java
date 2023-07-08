@@ -14,6 +14,7 @@ public class KeyFrame {
     private boolean snapTo;
     private int widthChange = 0;
     private int heightChange = 0;
+    private double fulcrumDistanceMultiplier = 1.0;
 
     /**
      * Get rotation of the joint.
@@ -139,5 +140,23 @@ public class KeyFrame {
      */
     public void setHeightChange(int heightChange) {
         this.heightChange = heightChange;
+    }
+
+    /**
+     * Get the distance multiplier the joint's center is from the fulcrum of the previous limb.
+     *
+     * @return The multiplier
+     */
+    public double getFulcrumDistanceMultiplier() {
+        return fulcrumDistanceMultiplier;
+    }
+
+    /**
+     * Set the distance multiplier the joint's center is from the fulcrum of the previous limb.
+     *
+     * @param fulcrumDistanceMultiplier The multiplier
+     */
+    public void setFulcrumDistanceMultiplier(double fulcrumDistanceMultiplier) {
+        this.fulcrumDistanceMultiplier = fulcrumDistanceMultiplier;
     }
 }

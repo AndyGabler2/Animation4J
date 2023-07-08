@@ -232,7 +232,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      */
     public AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> registerJoint(short id, double angleFromFulcrum, int distanceFromFulcrum, boolean renderBeneath, AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> toLimb) {
         final JointRegistration registration = new JointRegistration();
-        final AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> joint = new AnimationJoint<>(toLimb);
+        final AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> joint = new AnimationJoint<>(this, renderInstance.jointRegistrations.size(), toLimb);
 
         registration.distanceFromFulcrum = distanceFromFulcrum;
         registration.angleFromFulcrum = angleFromFulcrum;
@@ -281,6 +281,16 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         public void setHeightChange(int aHeightChange) {
             heightChange = aHeightChange;
         }
+
+        /**
+         * Set the distance from the fulcrum multiplier for a specific joint.
+         *
+         * @param jointPosition The position of the joint in the joint list on the limb render instance
+         * @param distanceMultiplier The distance multiplier
+         */
+        public void setDistanceFromFulcrumForJoint(int jointPosition, double distanceMultiplier) {
+            renderInstance.jointRegistrations.get(jointPosition).distanceFromFulcrumMultiplier = distanceMultiplier;
+        }
     }
 
     /**
@@ -307,5 +317,9 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
          * Will the limb attached to this joint be rendered beneath this joint.
          */
         boolean renderBeneath;
+        /**
+         * Multiplier for the distance from the fulcrum.
+         */
+        double distanceFromFulcrumMultiplier = 1.0;
     }
 }

@@ -12,10 +12,18 @@ import java.util.Objects;
 public class AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
     private double rotation;
+    private final AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> parent;
+    private final int parentJointRegistrationPosition;
     private final AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> limb;
 
-    public AnimationJoint(AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> limb) {
+    public AnimationJoint(
+        AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> parent,
+        int jointRegistrationPosition,
+        AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> limb
+    ) {
         Objects.requireNonNull(limb, "Joint must have non-null limb.");
+        this.parent = parent;
+        parentJointRegistrationPosition = jointRegistrationPosition;
         this.limb = limb;
     }
 
@@ -46,5 +54,35 @@ public class AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
     public AnimationJoint<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> setRotation(double rotation) {
         this.rotation = rotation;
         return this;
+    }
+
+    /**
+     * Get accessor for fields on the limb that may be adjusted by the Animation4J library after it has been finalized.
+     *
+     * @deprecated Framework use only. Anything set will be overriden.
+     * @return Accessor for fields that are modified during rendering after finalized
+     */
+    @Deprecated
+    public StateAccess stateAccessor() {
+        if (!parent.isFinalized()) {
+            throw new IllegalStateException("Attempted to get accessor for joint state when the joint has not been finalized.");
+        }
+        // State access should inherently have an instance of "this" with proper fields in scope
+        return new StateAccess();
+    }
+
+    /**
+     * Class with methods that can only be used when the limb has been finalized.
+     */
+    public class StateAccess {
+
+        /**
+         * Set the fulcrum distance multiplier.
+         *
+         * @param fulcrumDistanceMultiplier The fulcrum distance multiplier
+         */
+        public void setFulcrumDistanceMultiplier(double fulcrumDistanceMultiplier) {
+            parent.stateAccessor().setDistanceFromFulcrumForJoint(parentJointRegistrationPosition, fulcrumDistanceMultiplier);
+        }
     }
 }

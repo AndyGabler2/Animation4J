@@ -92,6 +92,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
                 joint.setRotation(current.getJointRotation());
                 joint.getLimb().stateAccessor().setWidthChange(current.getWidthChange());
                 joint.getLimb().stateAccessor().setHeightChange(current.getHeightChange());
+                joint.stateAccessor().setFulcrumDistanceMultiplier(current.getFulcrumDistanceMultiplier());
             } else {
                 // Calculate the percentage of the keyframe that is currently covered
                 final long ticksOnKeyFrame = (ticksOnAnimation % totalDuration) - frameState.getTickCounter();
@@ -111,10 +112,16 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
                 final double heightChangeDelta = target.getHeightChange() - current.getHeightChange();
                 final int nextJointHeightChange = current.getHeightChange() + (int) (heightChangeDelta * percentageCovered);
                 joint.getLimb().stateAccessor().setHeightChange(nextJointHeightChange);
+
+                // Handle the fulcrum distance multiplier
+                final double fulcrumDistanceMultiplierDelta = target.getFulcrumDistanceMultiplier() - current.getFulcrumDistanceMultiplier();
+                final double nextFulcrumDistanceMultiplier = current.getFulcrumDistanceMultiplier() + (fulcrumDistanceMultiplierDelta * percentageCovered);
+                joint.stateAccessor().setFulcrumDistanceMultiplier(nextFulcrumDistanceMultiplier);
             }
 
             frameState.setRenderedFirstFrame(true);
         });
+        // TODO deprecate this. Technically, this can be achieved by using a blank joint as the root limb.
         double rigRotation = rotation;
         if (!rootRotationFrames.isEmpty()) {
             if (rootRotationFrames.get(rootRotationFrames.size() - 1).getFirst() == null &&
@@ -386,6 +393,17 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
          */
         public KeyFrameBuilder withHeightChange(int heightChange) {
             frame.setHeightChange(heightChange);
+            return this;
+        }
+
+        /**
+         * Set the fulcrum distance multiplier.
+         *
+         * @param fulcrumDistanceMultiplier The multiplier
+         * @return Self
+         */
+        public KeyFrameBuilder withFulcrumDistanceMultiplier(double fulcrumDistanceMultiplier) {
+            frame.setFulcrumDistanceMultiplier(fulcrumDistanceMultiplier);
             return this;
         }
 
