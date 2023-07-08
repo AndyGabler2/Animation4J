@@ -33,32 +33,28 @@ public class PusherBaseStopMotionController extends StopMotionController<Object,
         final StopMotionState<Object, RetractablePusher, PusherBaseSpriteSheet> brokenState = breakingState
             .createTransitionState((o, retractablePusher) -> true);
         breakingState.createTransition(
-                (o, retractablePusher) -> !retractablePusher.isBroken(),
-                true,
-                neutralState
+            (o, retractablePusher) -> !retractablePusher.isBroken(),
+            true,
+            neutralState
         );
 
         brokenState.createTransition((o, retractablePusher) -> !retractablePusher.isBroken(), neutralState);
-
-        neutralState
-            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getNeutralSprite())
-            .addFrame(null, (spriteSheet, state) -> spriteSheet.getNeutralSprite());
 
         brokenState
             .addFrame(1L, (spriteSheet, state) -> spriteSheet.getBrokenSprite())
             .addFrame(null, (spriteSheet, state) -> spriteSheet.getBrokenSprite());
 
         breakingState
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite);
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite);
 
         return neutralState;
     }

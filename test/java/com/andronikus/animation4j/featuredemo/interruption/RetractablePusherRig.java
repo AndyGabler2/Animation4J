@@ -20,7 +20,7 @@ public class RetractablePusherRig extends AnimationRig<Object, RetractablePusher
             .setStopMotionController(new PusherBaseStopMotionController())
             .finishRigging();
 
-        baseLimb.registerJoint((short) 1, 0, 319, true)
+        baseLimb.registerJoint((short) 1, 0, 40, true)
             .getLimb()
             .setWidth(319)
             .setHeight(320)

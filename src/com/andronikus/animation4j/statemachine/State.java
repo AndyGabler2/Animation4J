@@ -22,8 +22,8 @@ public abstract class State<
     private boolean interruptible = true;
 
     /*
-     * Ignored if interruptable is "true", but in cases where this animation cannot be interrupted, this is a hook
-     * for transitions off of this state that are interruptable.
+     * Ignored if interruptible is "true", but in cases where this animation cannot be interrupted, this is a hook
+     * for transitions off of this state that are interruptible.
      */
     private Boolean transitionInterruptible = null;
 

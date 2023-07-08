@@ -38,6 +38,13 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
     private long ticksOnAnimation = 0L;
     private boolean finalized = false;
 
+    /**
+     * Constructor used to lock this class' constructor to package-private access.
+     *
+     * Can be instantiated from an {@link AnimationController} or from a parent {@link Animation}.
+     */
+    Animation () {}
+
     public void nextRender(
         GraphicsContext graphics,
         CONTEXT_PROVIDER contextObject,

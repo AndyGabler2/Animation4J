@@ -40,25 +40,21 @@ public class PusherArmStopMotionController extends StopMotionController<Object, 
 
         brokenState.createTransition((o, retractablePusher) -> !retractablePusher.isBroken(), neutralState);
 
-        neutralState
-            .addFrame(1L, (spriteSheet, state) -> spriteSheet.getNeutralSprite())
-            .addFrame(null, (spriteSheet, state) -> spriteSheet.getNeutralSprite());
-
         brokenState
             .addFrame(1L, (spriteSheet, state) -> spriteSheet.getBrokenSprite())
             .addFrame(null, (spriteSheet, state) -> spriteSheet.getBrokenSprite());
 
         breakingState
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite)
-            .addFrame(1L, PusherArmSpriteSheet::getBreakingSprite);
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite)
+            .addFrame(7L, PusherArmSpriteSheet::getBreakingSprite);
 
         return neutralState;
     }
