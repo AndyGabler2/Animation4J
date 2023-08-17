@@ -40,7 +40,7 @@ public class TransitionBasedInterruptibilityDemo extends JPanel implements Actio
 
     @Override
     public void paintComponent(Graphics graphics) {
-        graphics.setColor(Color.DARK_GRAY);
+        graphics.setColor(Color.GRAY);
         graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         final GraphicsContext context = new GraphicsContext();
@@ -52,7 +52,7 @@ public class TransitionBasedInterruptibilityDemo extends JPanel implements Actio
 
         graphics.setColor(Color.GREEN);
         graphics.setFont(Font.getFont(Font.DIALOG));
-        ((Graphics2D) graphics).drawString("Broken: " + pusher.isBroken() + ", Extending: " + pusher.isBroken(), 50, 50);
+        ((Graphics2D) graphics).drawString("Broken: " + pusher.isBroken() + ", Extending: " + pusher.isExtending(), 50, 50);
     }
 
     @Override

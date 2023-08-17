@@ -12,24 +12,47 @@ public class RetractablePusherAnimationController extends AnimationController<Ob
     @Override
     protected Animation<Object, RetractablePusher> buildInitialStatesAndTransitions() {
         /*
-         * Nuetral -> Extending (interruptible = false)
-         * Nuetral -> Breaking (interruptible = true)
+         * Nuetral -> Extending (interruptible = false) (v)
+         * Nuetral -> Breaking (interruptible = true) (v)
 
-         * Extending -> Extended (interruptible = false)
-         * Extending -> Breaking (interruptible = true)
+         * Extending -> Extended (interruptible = false) (v)
+         * Extending -> Breaking (interruptible = true) (v)
 
-         * Extended -> Breaking (interruptible = true)
-         * Extended -> Retracting (interruptible = true)
+         * Extended -> Breaking (interruptible = true) (v)
+         * Extended -> Retracting (interruptible = true) (v)
 
-         * Retracting -> Nuetral (interruptible = false)
-         * Retracting -> Breaking (interruptible = true)
+         * Retracting -> Neutral (interruptible = false) (v)
+         * Retracting -> Breaking (interruptible = true) (v)
 
-         * Breaking -> Broken (interruptible = false)
-         * Breaking -> Nuetral (interruptible = true)
+         * Breaking -> Broken (interruptible = false) (v)
+         * Breaking -> Neutral (interruptible = true) (v)
 
-         * Broken -> Nuetral (interruptible = true)
+         * Broken -> Neutral (interruptible = true)
          */
-        final Animation<Object, RetractablePusher> neutralState = createAnimation();
+        final Animation<Object, RetractablePusher> neutralState = createAnimation()
+            .withInterruptibleFlag(false);
+
+        final Animation<Object, RetractablePusher> extendingState = neutralState.createTransitionState((obj, pusher) -> pusher.isExtending())
+            .withInterruptibleFlag(false);
+
+        final Animation<Object, RetractablePusher> breakingState = neutralState.createTransitionState((obj, pusher) -> pusher.isExtending(), true)
+            .withInterruptibleFlag(false);
+
+        extendingState.createTransition((obj, pusher) -> pusher.isBroken(), true, breakingState);
+        breakingState.createTransition((obj, pusher) -> !pusher.isBroken(), true, neutralState);
+
+        final Animation<Object, RetractablePusher> extendedState = extendingState.createTransitionState((obj, pusher) -> true);
+
+        final Animation<Object, RetractablePusher> retractingState = extendedState.createTransitionState((obj, pusher) -> !pusher.isExtending())
+            .withInterruptibleFlag(false);
+        extendedState.createTransition((obj, pusher) -> pusher.isBroken(), breakingState);
+
+        retractingState.createTransition((obj, pusher) -> true, neutralState);
+        retractingState.createTransition((obj, pusher) -> pusher.isBroken(), true, breakingState);
+
+        final Animation<Object, RetractablePusher> brokenState = breakingState.createTransitionState((obj, pusher) -> true);
+
+        brokenState.createTransition((obj, pusher) -> !pusher.isBroken(), neutralState);
 
         return neutralState.finishAnimating();
     }

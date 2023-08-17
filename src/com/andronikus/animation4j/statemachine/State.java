@@ -40,6 +40,31 @@ public abstract class State<
         TRANSITION_CONTEXT contextProvider,
         TRANSITION_ROOT rootEntity
     ) {
+        // TODO bug discovered. If the criteria is met for two transitions, then we got a problem
+        // TODO, actually, this is a rather complex bug.
+        // TODO So as soon as we find that a transition from is OK, the state we transition to becomes the "real" state
+        // TODO this means the active state is no longer checked for transitions. We're transitioning off of the "real" state
+        /*
+         * Consider the following (~ is active, + is real)
+         *
+         * In first call, active and real state is A
+         *
+         * A(~+) ---> B ---> C
+         *       ---> D
+         * Suppose our end goal is State D. Well if the criteria is met for State A to transition to State B, then
+         * State B becomes the "real" state but State A remains the "active" state.
+         * A(~) ---> B(+) ---> C
+         *      ---> D
+         * If during this time, State C becomes the active state, we could very well still be having State A be the
+         * "active" state while State C is the one transitioning off of. This makes things especially clunky when conditions
+         * are met where we would expect the transition from State A to State D to fire.
+         *
+         * We could, in theory redesign this to be a non-deterministic finite automata, where the machine can be in two states
+         * at once.
+         *
+         * Solution could be to only check transitions off of the "active" state. Maybe here return an array of acceptable
+         * transitions.
+         */
         final Transition transitionToNextState = transitions.stream()
             .filter(transition -> transition.transitionFunction.apply(contextProvider, rootEntity))
             .findFirst().orElse(null);
@@ -138,6 +163,8 @@ public abstract class State<
     /**
      * Transition to this state. This should reset instance specific variables that need to be reset when the state is reused.
      *
+     * WARNING: A call to this method does not necessarily imply the state will be transitioned to nor is it idempotent.
+     *
      * Package private actions to take.
      */
     void prepareToBeActive() {
@@ -149,6 +176,8 @@ public abstract class State<
 
     /**
      * Transition to this state. This should reset instance specific variables that need to be reset when the state is reused.
+     *
+     * WARNING: A call to this method does not necessarily imply the state will be transitioned to nor is it idempotent.
      */
     public abstract void transitionTo();
 
