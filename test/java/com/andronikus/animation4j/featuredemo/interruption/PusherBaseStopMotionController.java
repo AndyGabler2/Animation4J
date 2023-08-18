@@ -31,7 +31,7 @@ public class PusherBaseStopMotionController extends StopMotionController<Object,
         breakingState.withInterruptibleFlag(false);
 
         final StopMotionState<Object, RetractablePusher, PusherBaseSpriteSheet> brokenState = breakingState
-            .createTransitionState((o, retractablePusher) -> true);
+            .createTransitionState(breakingState.completeCycleTransition());
         breakingState.createTransition(
             (o, retractablePusher) -> !retractablePusher.isBroken(),
             true,
@@ -46,15 +46,15 @@ public class PusherBaseStopMotionController extends StopMotionController<Object,
 
         breakingState
             .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite)
-            .addFrame(7L, PusherBaseSpriteSheet::getBreakingSprite);
+            .addFrame(6L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(6L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(4L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(4L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(3L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(3L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(2L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(1L, PusherBaseSpriteSheet::getBreakingSprite)
+            .addFrame(null, PusherBaseSpriteSheet::getBreakingSprite);
 
         return neutralState;
     }

@@ -188,6 +188,10 @@ public abstract class State<
      */
     protected abstract boolean atleastOneCycleFinished();
 
+    public BiFunction<TRANSITION_CONTEXT, TRANSITION_ROOT, Boolean> completeCycleTransition() {
+        return (context, root) -> atleastOneCycleFinished();
+    }
+
     /**
      * Create a blank state to be transitioned to.
      *
