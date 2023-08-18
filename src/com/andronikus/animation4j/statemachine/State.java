@@ -188,6 +188,22 @@ public abstract class State<
      */
     protected abstract boolean atleastOneCycleFinished();
 
+    /**
+     * New state to be created that will be transitioned to once the current state has been cycled
+     * through at least once.
+     *
+     * @return The new state
+     */
+    public STATE_TYPE completeCycleState() {
+        return createTransitionState(completeCycleTransition());
+    }
+
+    /**
+     * A transition condition that can be used to only transition upon completion of a full cycle
+     * of this state.
+     *
+     * @return Transition condition
+     */
     public BiFunction<TRANSITION_CONTEXT, TRANSITION_ROOT, Boolean> completeCycleTransition() {
         return (context, root) -> atleastOneCycleFinished();
     }

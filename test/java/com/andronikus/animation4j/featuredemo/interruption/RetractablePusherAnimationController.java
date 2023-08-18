@@ -43,7 +43,7 @@ public class RetractablePusherAnimationController extends AnimationController<Ob
         extendingState.createTransition((obj, pusher) -> pusher.isBroken(), true, breakingState);
         breakingState.createTransition((obj, pusher) -> !pusher.isBroken(), true, neutralState);
 
-        final Animation<Object, RetractablePusher> extendedState = extendingState.createTransitionState(extendingState.completeCycleTransition());
+        final Animation<Object, RetractablePusher> extendedState = extendingState.completeCycleState();
 
         final Animation<Object, RetractablePusher> retractingState = extendedState.createTransitionState((obj, pusher) -> !pusher.isExtending())
             .withInterruptibleFlag(false);
@@ -52,7 +52,7 @@ public class RetractablePusherAnimationController extends AnimationController<Ob
         retractingState.createTransition(retractingState.completeCycleTransition(), neutralState);
         retractingState.createTransition((obj, pusher) -> pusher.isBroken(), true, breakingState);
 
-        final Animation<Object, RetractablePusher> brokenState = breakingState.createTransitionState(breakingState.completeCycleTransition());
+        final Animation<Object, RetractablePusher> brokenState = breakingState.completeCycleState();
 
         brokenState.createTransition((obj, pusher) -> !pusher.isBroken(), neutralState);
 

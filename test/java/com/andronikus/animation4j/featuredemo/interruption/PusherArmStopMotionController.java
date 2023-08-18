@@ -31,7 +31,7 @@ public class PusherArmStopMotionController extends StopMotionController<Object, 
         breakingState.withInterruptibleFlag(false);
 
         final StopMotionState<Object, RetractablePusher, PusherArmSpriteSheet> brokenState = breakingState
-            .createTransitionState(breakingState.completeCycleTransition());
+            .completeCycleState();
         breakingState.createTransition(
             (o, retractablePusher) -> !retractablePusher.isBroken(),
             true,
