@@ -30,7 +30,7 @@ public abstract class DeterministicFiniteAutomata<
         initialState = buildInitialStatesAndTransitions();
         this.activeState = initialState;
         this.realState = initialState;
-        initialState.transitionTo();
+        initialState.prepareToBeActive();
     }
 
     /**
@@ -49,11 +49,11 @@ public abstract class DeterministicFiniteAutomata<
      * @return The result of the state's action
      */
     protected STATE_RESULT nextAction(TRANSITION_CONTEXT contextObject, TRANSITION_ROOT root, Object... parameters) {
-        final STATE_TYPE nextAnimation = realState.checkTransition(contextObject, root);
+        final STATE_TYPE nextState = realState.checkTransition(contextObject, root);
 
-        if (nextAnimation != null) {
-            realState = nextAnimation;
-            nextAnimation.transitionTo();
+        if (nextState != null) {
+            realState = nextState;
+            nextState.prepareToBeActive();
         }
 
         if (activeState != realState && activeState.isTransitionFromOkay()) {

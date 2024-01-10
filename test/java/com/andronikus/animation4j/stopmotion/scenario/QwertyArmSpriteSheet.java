@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 public class QwertyArmSpriteSheet extends SpriteSheet {
 
     public QwertyArmSpriteSheet() {
-        super("armtop.png", 32, 64);
+        super("qwerty/armtop.png", 32, 64);
     }
 
     public BufferedImage getNeutralSprite(int animationState) {

@@ -15,8 +15,6 @@ import java.util.function.Predicate;
 public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
     final List<AnimationLimb.JointRegistration> jointRegistrations = new ArrayList<>();
-    double fulcrumAngle = 0;
-    double fulcrumDistance = 0;
     int width = -1;
     int height = -1;
     boolean reflectX;
@@ -31,6 +29,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param animatedEntity The animated object
      * @param centerX The X coordinate of the center of the animation
      * @param centerY The Y coordinate of the center of the animation
+     * @param widthChange The adjustment to the width of the limb
+     * @param heightChange The adjustment to the height of the limb
      * @param angle The rotation angle
      * @param pretilt Rotation angle built up from previous limb's joint rotations
      */
@@ -40,6 +40,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         ANIMATION_OF_TYPE animatedEntity,
         int centerX,
         int centerY,
+        int widthChange,
+        int heightChange,
         double angle,
         double pretilt
     ) {
@@ -49,7 +51,7 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
 
         // TODO consider precalculating: Predicate list
         renderJoints(joint -> joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
-        renderPipeline(graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
+        renderPipeline(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt);
         renderJoints(joint -> !joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
     }
 
@@ -88,8 +90,9 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             // Then we calculate the fulcrum location.
             // Fulcrum is, in theory, fixed and rotation-agnostic
             // Using fulcrum location, use angleToNextCenter to calculate where the center of next limb is
-            final int nextX = centerX + (int)(joint.distanceFromFulcrum * Math.cos(angleToNextCenter));
-            final int nextY = centerY + (int)(joint.distanceFromFulcrum * Math.sin(angleToNextCenter));
+            final double fulcrumDistance = joint.distanceFromFulcrumMultiplier * ((double) joint.distanceFromFulcrum);
+            final int nextX = centerX + (int)(fulcrumDistance * Math.cos(angleToNextCenter));
+            final int nextY = centerY + (int)(fulcrumDistance * Math.sin(angleToNextCenter));
 
             joint.joint.getLimb().render(
                 graphics,
@@ -111,6 +114,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param animatedEntity The animated object
      * @param centerX The X coordinate of the center of the animation
      * @param centerY The Y coordinate of the center of the animation
+     * @param widthChange The adjustment to the width of the limb
+     * @param heightChange The adjustment to the height of the limb
      * @param angle The rotation angle
      * @param pretilt Rotation angle built up from previous limb's joint rotations
      */
@@ -120,6 +125,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         ANIMATION_OF_TYPE animatedEntity,
         int centerX,
         int centerY,
+        int widthChange,
+        int heightChange,
         double angle,
         double pretilt
     ) {
@@ -130,13 +137,16 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         graphicalInstance.scale(1, -1);
         graphicalInstance.translate(0, -graphics.getComponentHeight());
 
+        final int adjustedWidth = width + widthChange;
+        final int adjustedHeight = height + heightChange;
+
         int drawingX = 0;
-        int drawingY = height;
-        int drawingWidth = width;
-        int drawingHeight = -height;
+        int drawingY = adjustedHeight;
+        int drawingWidth = adjustedWidth;
+        int drawingHeight = -adjustedHeight;
 
         // Start by translation. Put the graphics at the center (well, the corner.)
-        graphicalInstance.translate(centerX - (width / 2), centerY - (height / 2));
+        graphicalInstance.translate(centerX - (adjustedWidth / 2), centerY - (adjustedHeight / 2));
         /*
          * Remember, rotation angle is aggregate, SUM(thetaL0 + thetaL1 + ... + thetaLi )
          * Fulcrum angle should only account for SUM(thetaL0 + thetaL1 + ... + thetaL(i - 1) )
@@ -146,19 +156,19 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
          */
         graphicalInstance.rotate(
             angle + pretilt,
-            width / 2,//TODO fulcrum
-            height / 2 //TODO fulcrum
+            adjustedWidth / 2,//TODO fulcrum
+            adjustedHeight / 2 //TODO fulcrum
         );
 
         // Reflective step
         if (reflectX) {
-            drawingX = width;
-            drawingWidth = -width;
+            drawingX = adjustedWidth;
+            drawingWidth = -adjustedWidth;
         }
 
         if (reflectY) {
             drawingY = 0;
-            drawingHeight = height;
+            drawingHeight = adjustedHeight;
         }
 
        // Drawing step

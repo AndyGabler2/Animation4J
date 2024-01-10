@@ -30,7 +30,7 @@ public class QwertyHeadStopMotionController extends StopMotionController<Object,
             .addFrame(6L, QwertyHeadSpriteSheet::getSadRecoverySprite)
             .addFrame(9L, QwertyHeadSpriteSheet::getSadRecoverySprite)
             .addFrame(null, QwertyHeadSpriteSheet::getSadRecoverySprite)
-            .withInterruptableFlag(false);
+            .withInterruptibleFlag(false);
 
         sadRecoveryState.createTransition((o, qwertyState) -> true, idleState);
 
@@ -43,7 +43,7 @@ public class QwertyHeadStopMotionController extends StopMotionController<Object,
                 .addFrame(2L, QwertyHeadSpriteSheet::getHappyRecoverySprite)
                 .addFrame(9L, QwertyHeadSpriteSheet::getHappyRecoverySprite)
                 .addFrame(null, QwertyHeadSpriteSheet::getHappyRecoverySprite)
-                .withInterruptableFlag(false);
+                .withInterruptibleFlag(false);
 
         happyRecoveryState.createTransition((o, qwertyState) -> true, idleState);
 

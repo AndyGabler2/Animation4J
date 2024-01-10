@@ -1,6 +1,7 @@
 package com.andronikus.animation4j.animation;
 
 import com.andronikus.animation4j.rig.AnimationJoint;
+import com.andronikus.animation4j.rig.AnimationLimb;
 import com.andronikus.animation4j.rig.AnimationRig;
 import com.andronikus.animation4j.rig.graphics.GraphicsContext;
 import com.andronikus.animation4j.statemachine.State;
@@ -36,6 +37,13 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
 
     private long ticksOnAnimation = 0L;
     private boolean finalized = false;
+
+    /**
+     * Constructor used to lock this class' constructor to package-private access.
+     *
+     * Can be instantiated from an {@link AnimationController} or from a parent {@link Animation}.
+     */
+    Animation () {}
 
     public void nextRender(
         GraphicsContext graphics,
@@ -89,16 +97,38 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
             if ((current.isSnapTo() && !frameState.isRenderedFirstFrame()) ||
                 current.getDuration() == null) {
                 joint.setRotation(current.getJointRotation());
+                joint.getLimb().stateAccessor().setWidthChange(current.getWidthChange());
+                joint.getLimb().stateAccessor().setHeightChange(current.getHeightChange());
+                joint.stateAccessor().setFulcrumDistanceMultiplier(current.getFulcrumDistanceMultiplier());
             } else {
-                final double rotationDelta = target.getJointRotation() - current.getJointRotation();
+                // Calculate the percentage of the keyframe that is currently covered
                 final long ticksOnKeyFrame = (ticksOnAnimation % totalDuration) - frameState.getTickCounter();
                 final double percentageCovered = ((double) ticksOnKeyFrame) / ((double) current.getDuration());
+
+                // Handle the rotation of the joint
+                final double rotationDelta = target.getJointRotation() - current.getJointRotation();
                 final double nextJointRotation = current.getJointRotation() + (rotationDelta * percentageCovered);
                 joint.setRotation(nextJointRotation);
+
+                // Handle the width of the limb
+                final double widthChangeDelta = target.getWidthChange() - current.getWidthChange();
+                final int nextJointWidthChange = current.getWidthChange() + (int) (widthChangeDelta * percentageCovered);
+                joint.getLimb().stateAccessor().setWidthChange(nextJointWidthChange);
+
+                // Handle the height of the limb
+                final double heightChangeDelta = target.getHeightChange() - current.getHeightChange();
+                final int nextJointHeightChange = current.getHeightChange() + (int) (heightChangeDelta * percentageCovered);
+                joint.getLimb().stateAccessor().setHeightChange(nextJointHeightChange);
+
+                // Handle the fulcrum distance multiplier
+                final double fulcrumDistanceMultiplierDelta = target.getFulcrumDistanceMultiplier() - current.getFulcrumDistanceMultiplier();
+                final double nextFulcrumDistanceMultiplier = current.getFulcrumDistanceMultiplier() + (fulcrumDistanceMultiplierDelta * percentageCovered);
+                joint.stateAccessor().setFulcrumDistanceMultiplier(nextFulcrumDistanceMultiplier);
             }
 
             frameState.setRenderedFirstFrame(true);
         });
+        // TODO deprecate this. Technically, this can be achieved by using a blank joint as the root limb.
         double rigRotation = rotation;
         if (!rootRotationFrames.isEmpty()) {
             if (rootRotationFrames.get(rootRotationFrames.size() - 1).getFirst() == null &&
@@ -206,11 +236,29 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
      * {@inheritDoc}
      */
     @Override
-    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition, Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation) {
+    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(
+        BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition,
+        Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation
+    ) {
         if (finalized) {
             throw new IllegalStateException("Transition cannot be created after animation finalization.");
         }
         return super.createTransition(condition, nextAnimation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> createTransition(
+        BiFunction<CONTEXT_PROVIDER, ANIMATION_TYPE, Boolean> condition,
+        boolean interruptible,
+        Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> nextAnimation
+    ) {
+        if (finalized) {
+            throw new IllegalStateException("Transition cannot be created after animation finalization.");
+        }
+        return super.createTransition(condition, interruptible, nextAnimation);
     }
 
     /**
@@ -263,6 +311,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         private KeyFrame frame;
         private short jointId;
         private AnimationJoint<CONTEXT_PROVIDER, ANIMATION_TYPE> joint;
+        private AnimationLimb<CONTEXT_PROVIDER, ANIMATION_TYPE> limb;
 
         /**
          * Set the joint that this keyframe is for.
@@ -273,6 +322,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         public KeyFrameBuilder withJoint(short jointId) {
             this.jointId = jointId;
             joint = rig.jointForId(jointId);
+            limb = joint.getLimb();
             return this;
         }
 
@@ -332,6 +382,39 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         }
 
         /**
+         * Set the amount the width of the limb this joint goes to changes at this keyframe.
+         *
+         * @param widthChange The change in width
+         * @return Self
+         */
+        public KeyFrameBuilder withWidthChange(int widthChange) {
+            frame.setWidthChange(widthChange);
+            return this;
+        }
+
+        /**
+         * Set the amount the height of the limb this joint goes to changes at this keyframe.
+         *
+         * @param heightChange The change in height
+         * @return Self
+         */
+        public KeyFrameBuilder withHeightChange(int heightChange) {
+            frame.setHeightChange(heightChange);
+            return this;
+        }
+
+        /**
+         * Set the fulcrum distance multiplier.
+         *
+         * @param fulcrumDistanceMultiplier The multiplier
+         * @return Self
+         */
+        public KeyFrameBuilder withFulcrumDistanceMultiplier(double fulcrumDistanceMultiplier) {
+            frame.setFulcrumDistanceMultiplier(fulcrumDistanceMultiplier);
+            return this;
+        }
+
+        /**
          * Build the key frame and add it to the animation.
          *
          * @return The animation
@@ -340,6 +423,26 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
             if (finalized) {
                 throw new IllegalStateException("Key frame cannot be added after animation finalization.");
             }
+            if (joint == null) {
+                throw new IllegalArgumentException("No joint for ID " + jointId + ".");
+            }
+            // Redundant since every joint should have a limb it goes to, but never hurts
+            if (limb == null) {
+                throw new IllegalArgumentException("The joint for ID " + jointId + " has no limb.");
+            }
+            /*
+             * If the width change is LESS than the negative width of the limb, disallow it.
+             * This is probably a pretty unnecessary constraint, but a precaution.
+             * TODO When it's been tested, this can be removed.
+             * TODO can also be subverted, but it's a nice gesture
+             */
+            if ((frame.getWidthChange() < 0 && frame.getWidthChange() <= -limb.getWidth()) || (frame.getWidthChange() > 0 && frame.getWidthChange() >= -limb.getWidth())) {
+                throw new IllegalArgumentException("The width change of the frame is larger than the negative width of the limb.");
+            }
+            if ((frame.getHeightChange() < 0 && frame.getHeightChange() <= -limb.getHeight()) || (frame.getHeightChange() > 0 && frame.getHeightChange() >= -limb.getHeight())) {
+                throw new IllegalArgumentException("The height change of the frame is larger than the negative width of the limb.");
+            }
+
             // First up, see if there is an entry for the joint.
             Pair<Long, List<KeyFrame>> pairings = keyFrames.get(joint);
 

@@ -40,7 +40,7 @@ public class StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_T
     // Ticks until state is reset, maintained by additions to the frames
     private long frameResetTickCount = 0;
 
-    // Whether or not a frame has been added to the state that declares this as the last frame to be rendered
+    // Whether a frame has been added to the state that declares this as the last frame to be rendered
     private boolean finalFrameAdded = false;
 
     /**
@@ -50,7 +50,6 @@ public class StopMotionState<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_T
      */
     public StopMotionState(StopMotionController<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, SPRITE_SHEET_TYPE> controller) {
         super();
-        // TODO Hook this in
         this.controller = controller;
     }
 
