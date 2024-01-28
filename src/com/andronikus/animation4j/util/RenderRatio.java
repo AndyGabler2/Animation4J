@@ -1,7 +1,7 @@
 package com.andronikus.animation4j.util;
 
 /**
- * Ratio of the intended render sizes. The use case is if sprites or animations were designed with a certain screen
+ * Ratio to the intended render sizes. The use case is if sprites or animations were designed with a certain screen
  * resolution, that they would be able to scale up or down to other resolutions.
  *
  * @author Andronikus
@@ -16,6 +16,14 @@ public class RenderRatio {
     private double widthScale = 1.0;
     private double heightScale = 1.0;
 
+    /**
+     * Instantiate ratio to the intended render sizes.
+     *
+     * @param aDefaultResolutionWidth The width of the resolution something was intended to be at
+     * @param aDefaultResolutionHeight The height of the resolution something was intende to be at
+     * @param actualResolutionWidth The width of the actual resolution
+     * @param actualResolutionHeight The height of the actual resolution
+     */
     public RenderRatio(int aDefaultResolutionWidth, int aDefaultResolutionHeight, int actualResolutionWidth, int actualResolutionHeight) {
         this(aDefaultResolutionWidth, aDefaultResolutionHeight);
         calculate(actualResolutionWidth, actualResolutionHeight);
