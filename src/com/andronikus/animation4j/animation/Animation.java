@@ -167,7 +167,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
             }
         }
 
-        rig.renderFromCenter(graphics, contextObject, animatedEntity, centerX, centerY, rigRotation);
+        rig.renderFromCenter(graphics, contextObject, animatedEntity, centerX, centerY, rigRotation, renderRatio);
         ticksOnAnimation++;
     }
 

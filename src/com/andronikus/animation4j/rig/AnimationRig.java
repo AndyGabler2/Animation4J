@@ -1,6 +1,7 @@
 package com.andronikus.animation4j.rig;
 
 import com.andronikus.animation4j.rig.graphics.GraphicsContext;
+import com.andronikus.animation4j.util.RenderRatio;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,14 +63,38 @@ public abstract class AnimationRig<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param rotation The rotation
      */
     public void renderFromCenter(
+            GraphicsContext graphics,
+            CONTEXT_OBJECT_TYPE contextObject,
+            ANIMATION_OF_TYPE animatedEntity,
+            int centerX,
+            int centerY,
+            double rotation
+    ) {
+        final RenderRatio oneToOneRatio = new RenderRatio(1, 1, 1, 1);
+        renderFromCenter(graphics, contextObject, animatedEntity, centerX, centerY, rotation, oneToOneRatio);
+    }
+
+    /**
+     * Render the rig from its center point.
+     *
+     * @param graphics The graphics context
+     * @param contextObject The object that gives greater context
+     * @param animatedEntity The object being animated
+     * @param centerX The X of the center point
+     * @param centerY The Y of the center point
+     * @param rotation The rotation
+     * @param renderRatio Scale at which is to be rendered
+     */
+    public void renderFromCenter(
         GraphicsContext graphics,
         CONTEXT_OBJECT_TYPE contextObject,
         ANIMATION_OF_TYPE animatedEntity,
         int centerX,
         int centerY,
-        double rotation
+        double rotation,
+        RenderRatio renderRatio
     ) {
-        rootLimbs.forEach(limb -> limb.render(graphics, contextObject, animatedEntity, centerX, centerY, rotation, 0));
+        rootLimbs.forEach(limb -> limb.render(graphics, contextObject, animatedEntity, centerX, centerY, rotation, 0, renderRatio));
     }
 
     /**

@@ -25,6 +25,7 @@ public class RenderRatioDemo extends JPanel {
     // Slider variables
     private final JSlider widthSlider;
     private final JSlider heightSlider;
+    private final JSlider rotationSlider;
 
     // Control variables for the head display on screen
     private final QwertyState robotHeadState = new QwertyState();
@@ -38,6 +39,7 @@ public class RenderRatioDemo extends JPanel {
     private final JRadioButton robotHeadRadioButton = new JRadioButton("QWERTY Head");
     private int robotHeadWidthPercentage = 100;
     private int robotHeadHeightPercentage = 100;
+    private int robotHeadRotationDegrees = 0;
 
     // Control variables for the entire robot on screen
     private final QwertyState embodiedRobotState = new QwertyState();
@@ -51,6 +53,7 @@ public class RenderRatioDemo extends JPanel {
     private final JRadioButton embodiedRobotRadioButton = new JRadioButton("Robot");
     private int embodiedRobotWidthPercentage = 100;
     private int embodiedRobotHeightPercentage = 100;
+    private int embodiedRobotRotationDegrees = 0;
 
     // Control variables for the retractable pusher on screen
     private final RetractablePusher pusherState = new RetractablePusher();
@@ -64,6 +67,7 @@ public class RenderRatioDemo extends JPanel {
     private final JRadioButton pusherRadioButton = new JRadioButton("Pusher");
     private int pusherWidthPercentage = 100;
     private int pusherHeightPercentage = 100;
+    private int pusherRotationDegrees = 0;
 
     public RenderRatioDemo() {
 
@@ -73,9 +77,8 @@ public class RenderRatioDemo extends JPanel {
 
         final BorderLayout mainLayout = new BorderLayout();
         final JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(7, 0));
+        buttonPanel.setLayout(new GridLayout(9, 0));
 
-        // TODO rotation slider?
         buttonPanel.add(new JLabel("Width Ratio"));
         final RenderRatioSlider changeListener = new RenderRatioSlider();
         widthSlider = new JSlider(0, 200, 100);
@@ -85,6 +88,10 @@ public class RenderRatioDemo extends JPanel {
         heightSlider = new JSlider(0, 200, 100);
         heightSlider.addChangeListener(changeListener);
         buttonPanel.add(heightSlider);
+        buttonPanel.add(new JLabel("Rotation"));
+        rotationSlider = new JSlider(-720, 720, 0);
+        rotationSlider.addChangeListener(changeListener);
+        buttonPanel.add(rotationSlider);
 
         final ButtonGroup radioButtonGroup = new ButtonGroup();
         final SelectionListener selectionListener = new SelectionListener();
@@ -173,6 +180,7 @@ public class RenderRatioDemo extends JPanel {
         graphics.setColor(Color.MAGENTA);
         graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+        // TODO transform this
         BufferedImage headSprite = robotHeadStopMotionController.nextSprite(new Object(), robotHeadState);
         graphics.drawImage(
             headSprite, 0, 0, robotHeadRenderRatio.scaleHorizontal(350),
@@ -184,12 +192,12 @@ public class RenderRatioDemo extends JPanel {
         graphicsContext.setObserver(this);
         embodiedRobotAnimationController.forceSetRenderRatio(embodiedRobotRenderRatio);
         embodiedRobotAnimationController.renderNext(
-            graphicsContext, new Object(), embodiedRobotState, 600, 600, 0
+            graphicsContext, new Object(), embodiedRobotState, 600, 600, Math.toRadians(embodiedRobotRotationDegrees)
         );
 
         pusherAnimationController.forceSetRenderRatio(pusherRenderRatio);
         pusherAnimationController.renderNext(
-            graphicsContext, new Object(), pusherState, 950, 250, 0
+            graphicsContext, new Object(), pusherState, 950, 250, Math.toRadians(pusherRotationDegrees)
         );
     }
 
@@ -247,6 +255,17 @@ public class RenderRatioDemo extends JPanel {
 
         @Override
         public void stateChanged(ChangeEvent event) {
+            if (event.getSource() == rotationSlider) {
+                if (robotHeadRadioButton.isSelected()) {
+                    robotHeadRotationDegrees = rotationSlider.getValue();
+                } else if (embodiedRobotRadioButton.isSelected()) {
+                    embodiedRobotRotationDegrees = rotationSlider.getValue();
+                } else {
+                    pusherRotationDegrees = rotationSlider.getValue();
+                }
+                return;
+            }
+
             RenderRatio renderRatioToAdjust;
             int widthPercentage = widthSlider.getValue();
             int heightPercentage = heightSlider.getValue();
@@ -288,12 +307,15 @@ public class RenderRatioDemo extends JPanel {
             if (event.getSource() == robotHeadRadioButton) {
                 widthSlider.setValue(robotHeadWidthPercentage);
                 heightSlider.setValue(robotHeadHeightPercentage);
+                rotationSlider.setValue(robotHeadRotationDegrees);
             } else if (event.getSource() == embodiedRobotRadioButton) {
                 widthSlider.setValue(embodiedRobotWidthPercentage);
                 heightSlider.setValue(embodiedRobotHeightPercentage);
+                rotationSlider.setValue(embodiedRobotRotationDegrees);
             } else if (event.getSource() == pusherRadioButton) {
                 widthSlider.setValue(pusherWidthPercentage);
                 heightSlider.setValue(pusherHeightPercentage);
+                rotationSlider.setValue(pusherRotationDegrees);
             }
         }
     }

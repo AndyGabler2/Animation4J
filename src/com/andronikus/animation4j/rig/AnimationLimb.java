@@ -4,6 +4,7 @@ import com.andronikus.animation4j.rig.graphics.GraphicsContext;
 import com.andronikus.animation4j.rig.imageprovider.StaticLimbImageProvider;
 import com.andronikus.animation4j.rig.imageprovider.StopMotionLimbImageProvider;
 import com.andronikus.animation4j.stopmotion.StopMotionController;
+import com.andronikus.animation4j.util.RenderRatio;
 
 import java.awt.Image;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param centerY The center y
      * @param angle Angle the limb and its children will be tilted at
      * @param pretilt Tilt from limbs this is jointed from
+     * @param renderRatio Scale at which is to be rendered
      */
     public void render(
         GraphicsContext graphics,
@@ -40,7 +42,8 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         int centerX,
         int centerY,
         double angle,
-        double pretilt
+        double pretilt,
+        RenderRatio renderRatio
     ) {
         if (!finalized) {
             throw new IllegalStateException("Animation limb must be finalized before rendering.");
@@ -50,7 +53,7 @@ public class AnimationLimb<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             throw new IllegalArgumentException("Image provider cannot animate given entity.");
         }
 
-        renderInstance.doRender(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt);
+        renderInstance.doRender(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt, renderRatio);
     }
 
     /**
