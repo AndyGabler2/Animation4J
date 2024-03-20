@@ -47,7 +47,6 @@ public class RobotAnimationMain extends JPanel implements ActionListener {
         final GraphicsContext context = new GraphicsContext();
         context.setGraphics2d((Graphics2D)graphics);
         context.setObserver(this);
-        context.setComponentHeight(this.getHeight());
 
         controller.renderNext(context, new Object(), qwertyState, 800, 400, 0);
     }

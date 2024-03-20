@@ -52,7 +52,6 @@ public class RigScenarioRunner extends JPanel implements ActionListener {
         final GraphicsContext context = new GraphicsContext();
         context.setGraphics2d((Graphics2D)graphics);
         context.setObserver(this);
-        context.setComponentHeight(this.getHeight());
 
         graphics.setColor(Color.CYAN);
         ((Graphics2D) graphics).setStroke(new BasicStroke());

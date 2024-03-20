@@ -46,7 +46,6 @@ public class TransitionBasedInterruptibilityDemo extends JPanel implements Actio
         final GraphicsContext context = new GraphicsContext();
         context.setGraphics2d((Graphics2D)graphics);
         context.setObserver(this);
-        context.setComponentHeight(this.getHeight());
 
         controller.renderNext(context, new Object(), pusher, 800, 400, 0);
 
