@@ -41,8 +41,8 @@ public class RenderRatio {
      * @param resolutionHeight The height of the screen
      */
     public void calculate(int resolutionWidth, int resolutionHeight) {
-        widthScale = ((double)resolutionWidth / 2) / (double) defaultResolutionWidth;
-        heightScale = ((double)resolutionHeight / 2) / (double) defaultResolutionHeight;
+        widthScale = ((double) resolutionWidth) / (double) defaultResolutionWidth;
+        heightScale = ((double) resolutionHeight) / (double) defaultResolutionHeight;
     }
 
     /**
@@ -128,5 +128,23 @@ public class RenderRatio {
 
         final RenderRatio inputRatio = (RenderRatio) object;
         return inputRatio.widthScale == widthScale && inputRatio.heightScale == heightScale;
+    }
+
+    /**
+     * Get the width scale of the render ratio.
+     *
+     * @return Width scale
+     */
+    public double getWidthScale() {
+        return widthScale;
+    }
+
+    /**
+     * Get the height scale of the render ratio.
+     *
+     * @return Height scale
+     */
+    public double getHeightScale() {
+        return heightScale;
     }
 }

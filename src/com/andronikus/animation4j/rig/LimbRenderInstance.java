@@ -96,8 +96,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             // Fulcrum is, in theory, fixed and rotation-agnostic
             // Using fulcrum location, use angleToNextCenter to calculate where the center of next limb is
             final double fulcrumDistance = joint.distanceFromFulcrumMultiplier * ((double) joint.distanceFromFulcrum);
-            final int nextX = centerX + (int)(fulcrumDistance * Math.cos(angleToNextCenter));
-            final int nextY = centerY + (int)(fulcrumDistance * Math.sin(angleToNextCenter));
+            final int nextX = centerX + (int) renderRatio.scaleHorizontal(fulcrumDistance * Math.cos(angleToNextCenter));
+            final int nextY = centerY + (int) renderRatio.scaleVertical(fulcrumDistance * Math.sin(angleToNextCenter));
 
             joint.joint.getLimb().render(
                 graphics,
@@ -141,10 +141,18 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         //TODO 1: RENDER RATIO: MAKE THE MAGIC HAPPEN
         // Calculate some initial values
         final Graphics2D graphicalInstance = graphics.createGraphicalInstance();
+        final double limbRotation = angle + pretilt;
 
         // Flip the image
         graphicalInstance.scale(1, -1);
         graphicalInstance.translate(0, -graphics.getComponentHeight());
+
+        /*
+         * Render ratio needs to take into account how flipped or not flipped this limb is.
+         * To do so, we shall consider the angle and pretilt.
+         */
+        final double widthScale = renderRatio.getWidthScale();
+        final double heightScale = renderRatio.getHeightScale();
 
         final int adjustedWidth = width + widthChange;
         final int adjustedHeight = height + heightChange;
@@ -163,8 +171,9 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
          * pretilt = SUM(thetaL0 + thetaL1 + ... + thetaL(i - 1) )
          * Therefore, add them together
          */
+        graphicalInstance.scale(widthScale, heightScale);
         graphicalInstance.rotate(
-            angle + pretilt,
+            limbRotation,
             adjustedWidth / 2,//TODO fulcrum
             adjustedHeight / 2 //TODO fulcrum
         );
