@@ -1,6 +1,7 @@
 package com.andronikus.animation4j.rig;
 
 import com.andronikus.animation4j.rig.graphics.GraphicsContext;
+import com.andronikus.animation4j.util.RenderRatio;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param heightChange The adjustment to the height of the limb
      * @param angle The rotation angle
      * @param pretilt Rotation angle built up from previous limb's joint rotations
+     * @param renderRatio Scale at which is to be rendered
      */
     public void doRender(
         GraphicsContext graphics,
@@ -43,16 +45,17 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         int widthChange,
         int heightChange,
         double angle,
-        double pretilt
+        double pretilt,
+        RenderRatio renderRatio
     ) {
         if (!imageProvider.canAnimateEntity(animatedEntity)) {
             throw new IllegalArgumentException("Animated entity cannot be rendered by image provider.");
         }
 
         // TODO consider precalculating: Predicate list
-        renderJoints(joint -> joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
-        renderPipeline(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt);
-        renderJoints(joint -> !joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt);
+        renderJoints(joint -> joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt, renderRatio);
+        renderPipeline(graphics, contextObject, animatedEntity, centerX, centerY, widthChange, heightChange, angle, pretilt, renderRatio);
+        renderJoints(joint -> !joint.renderBeneath, graphics, contextObject, animatedEntity, centerX, centerY, angle, pretilt, renderRatio);
     }
 
     /**
@@ -66,6 +69,7 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param centerY The Y coordinate of the center of the animation
      * @param angle The rotation angle
      * @param pretilt Rotation angle built up from previous limb's joint rotations
+     * @param renderRatio Scale at which is to be rendered
      */
     private void renderJoints(
         Predicate<AnimationLimb.JointRegistration> renderCondition,
@@ -75,7 +79,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         int centerX,
         int centerY,
         double angle,
-        double pretilt
+        double pretilt,
+        RenderRatio renderRatio
     ) {
         jointRegistrations.stream().filter(renderCondition).forEach(joint -> {
             /*
@@ -91,8 +96,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             // Fulcrum is, in theory, fixed and rotation-agnostic
             // Using fulcrum location, use angleToNextCenter to calculate where the center of next limb is
             final double fulcrumDistance = joint.distanceFromFulcrumMultiplier * ((double) joint.distanceFromFulcrum);
-            final int nextX = centerX + (int)(fulcrumDistance * Math.cos(angleToNextCenter));
-            final int nextY = centerY + (int)(fulcrumDistance * Math.sin(angleToNextCenter));
+            final int nextX = centerX + (int) renderRatio.scaleHorizontal(fulcrumDistance * Math.cos(angleToNextCenter));
+            final int nextY = centerY + (int) renderRatio.scaleVertical(fulcrumDistance * Math.sin(angleToNextCenter));
 
             joint.joint.getLimb().render(
                 graphics,
@@ -101,7 +106,8 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
                 nextX,
                 nextY,
                 joint.joint.getRotation(), // thetaLi, otherwise covered in pretilt
-                nextPretilt
+                nextPretilt,
+                renderRatio
             );
         });
     }
@@ -118,6 +124,7 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
      * @param heightChange The adjustment to the height of the limb
      * @param angle The rotation angle
      * @param pretilt Rotation angle built up from previous limb's joint rotations
+     * @param renderRatio Scale at which is to be rendered
      */
     private void renderPipeline(
         GraphicsContext graphics,
@@ -128,14 +135,24 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
         int widthChange,
         int heightChange,
         double angle,
-        double pretilt
+        double pretilt,
+        RenderRatio renderRatio
     ) {
+        //TODO 1: RENDER RATIO: MAKE THE MAGIC HAPPEN
         // Calculate some initial values
         final Graphics2D graphicalInstance = graphics.createGraphicalInstance();
+        final double limbRotation = angle + pretilt;
 
         // Flip the image
         graphicalInstance.scale(1, -1);
         graphicalInstance.translate(0, -graphics.getComponentHeight());
+
+        /*
+         * Render ratio needs to take into account how flipped or not flipped this limb is.
+         * To do so, we shall consider the angle and pretilt.
+         */
+        final double widthScale = renderRatio.getWidthScale();
+        final double heightScale = renderRatio.getHeightScale();
 
         final int adjustedWidth = width + widthChange;
         final int adjustedHeight = height + heightChange;
@@ -154,8 +171,9 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
          * pretilt = SUM(thetaL0 + thetaL1 + ... + thetaL(i - 1) )
          * Therefore, add them together
          */
+        graphicalInstance.scale(widthScale, heightScale);
         graphicalInstance.rotate(
-            angle + pretilt,
+            limbRotation,
             adjustedWidth / 2,//TODO fulcrum
             adjustedHeight / 2 //TODO fulcrum
         );
@@ -171,7 +189,7 @@ public class LimbRenderInstance<CONTEXT_OBJECT_TYPE, ANIMATION_OF_TYPE> {
             drawingHeight = adjustedHeight;
         }
 
-       // Drawing step
+        // Drawing step
         imageProvider.provideContext(contextObject, animatedEntity);
         graphicalInstance.drawImage(imageProvider.getImage(), drawingX, drawingY, drawingWidth, drawingHeight, graphics.getObserver());
 

@@ -6,7 +6,7 @@ import com.andronikus.animation4j.stopmotion.StopMotionController;
 import java.awt.Image;
 
 /**
- * Animation limb image provider that uses a stop motion controller to supply images.
+ * Animation limb image provider that uses a stop-motion controller to supply images.
  *
  * @param <CONTEXT_OBJECT_TYPE> Type of object providing greater context
  * @param <ANIMATION_OF_TYPE> Type of object being animated

@@ -1,7 +1,7 @@
 package com.andronikus.animation4j.rig.graphics;
 
 import java.awt.Graphics2D;
-import java.awt.image.ImageObserver;
+import javax.swing.JComponent;
 
 /**
  * Information carrier about the graphics.
@@ -11,8 +11,7 @@ import java.awt.image.ImageObserver;
 public class GraphicsContext {
 
     private Graphics2D graphics2d;
-    private ImageObserver observer;
-    private int componentHeight;
+    private JComponent observer;
 
     /**
      * Set the graphics being used.
@@ -28,7 +27,7 @@ public class GraphicsContext {
      *
      * @return The observer
      */
-    public ImageObserver getObserver() {
+    public JComponent getObserver() {
         return observer;
     }
 
@@ -37,7 +36,7 @@ public class GraphicsContext {
      *
      * @param observer The observer
      */
-    public void setObserver(ImageObserver observer) {
+    public void setObserver(JComponent observer) {
         this.observer = observer;
     }
 
@@ -47,16 +46,7 @@ public class GraphicsContext {
      * @return The height
      */
     public int getComponentHeight() {
-        return componentHeight;
-    }
-
-    /**
-     * Set the height of the component this is being rendered on.
-     *
-     * @param componentHeight The height
-     */
-    public void setComponentHeight(int componentHeight) {
-        this.componentHeight = componentHeight;
+        return observer.getHeight();
     }
 
     /**

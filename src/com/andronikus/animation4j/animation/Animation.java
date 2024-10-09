@@ -6,6 +6,7 @@ import com.andronikus.animation4j.rig.AnimationRig;
 import com.andronikus.animation4j.rig.graphics.GraphicsContext;
 import com.andronikus.animation4j.statemachine.State;
 import com.andronikus.animation4j.util.Pair;
+import com.andronikus.animation4j.util.RenderRatio;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +52,8 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
         ANIMATION_TYPE animatedEntity,
         int centerX,
         int centerY,
-        double rotation
+        double rotation,
+        RenderRatio renderRatio
     ) {
         if (!finalized) {
             throw new IllegalStateException("Cannot render animation that is not finalized.");
@@ -165,7 +167,7 @@ public class Animation<CONTEXT_PROVIDER, ANIMATION_TYPE> extends State<
             }
         }
 
-        rig.renderFromCenter(graphics, contextObject, animatedEntity, centerX, centerY, rigRotation);
+        rig.renderFromCenter(graphics, contextObject, animatedEntity, centerX, centerY, rigRotation, renderRatio);
         ticksOnAnimation++;
     }
 

@@ -6,7 +6,7 @@ import com.andronikus.animation4j.statemachine.DeterministicFiniteAutomata;
 import java.awt.image.BufferedImage;
 
 /**
- * Controller for stop motion animation of some kind of object.
+ * Controller for stop-motion animation of some kind of object.
  *
  * @param <ANIMATION_OF_TYPE> Type of object being animated
  * @param <SPRITE_SHEET_TYPE> Sprite sheet to pull animation states from
@@ -22,7 +22,7 @@ public abstract class StopMotionController<CONTEXT_PROVIDER, ANIMATION_OF_TYPE, 
     private final SPRITE_SHEET_TYPE spriteSheet;
 
     /**
-     * Instantiate a controller for stop motion animation of some kind of object.
+     * Instantiate a controller for stop-motion animation of some kind of object.
      *
      * @param spriteSheet The sprite sheet to use in the animations
      */
